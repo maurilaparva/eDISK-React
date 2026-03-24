@@ -41,6 +41,6 @@ export default defineConfig(({ mode }) => {
         },
 
     // For GitHub Pages, assets must be loaded from /REPO_NAME/ subpath
-    base: isGHPages ? '/eDISK/' : '/',
+    base: isGHPages ? '/eDISK-React/' : '/',
   };
 });
