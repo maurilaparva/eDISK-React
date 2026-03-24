@@ -1,0 +1,172 @@
+Query Metadata
+--------------
+{'question': "What supplements could prevent Alzheimer's disease?",
+ 'relation': 'prevents',
+ 'timestamp_utc': '20260210_221234'}
+
+Parsed Entities
+---------------
+[{'text': "Alzheimer's disease", 'type': 'Disease'},
+ {'text': 'supplements', 'type': 'DSI'},
+ {'text': 'disease', 'type': 'Disease'}]
+
+Entity Linking
+--------------
+{'candidates': [{'candidates': [{'id': 'DIS003570',
+                                 'name': "Alzheimer's Disease",
+                                 'score': 0.919377326965332,
+                                 'type': 'Dis'},
+                                {'id': 'DIS001977',
+                                 'name': 'familial Alzheimer disease',
+                                 'score': 0.7066658735275269,
+                                 'type': 'Dis'},
+                                {'id': 'DIS001510',
+                                 'name': 'Dementia',
+                                 'score': 0.6989977955818176,
+                                 'type': 'Dis'},
+                                {'id': 'DIS000236',
+                                 'name': 'dementia',
+                                 'score': 0.6883754134178162,
+                                 'type': 'Dis'},
+                                {'id': 'DIS001877',
+                                 'name': 'Alzheimer Disease, Early Onset',
+                                 'score': 0.6587128639221191,
+                                 'type': 'Dis'},
+                                {'id': 'DIS000539',
+                                 'name': 'Alzheimer Disease, Late Onset',
+                                 'score': 0.6464012861251831,
+                                 'type': 'Dis'},
+                                {'id': 'DIS003603',
+                                 'name': 'Dementia, Vascular',
+                                 'score': 0.6039977669715881,
+                                 'type': 'Dis'},
+                                {'id': 'DIS002563',
+                                 'name': 'Alexander Disease',
+                                 'score': 0.6000210046768188,
+                                 'type': 'Dis'},
+                                {'id': 'DIS001485',
+                                 'name': 'Amyloid deposition',
+                                 'score': 0.5936180949211121,
+                                 'type': 'Dis'}],
+                 'input': {'text': "Alzheimer's disease", 'type': 'Disease'}},
+                {'candidates': [{'id': 'DSI008855',
+                                 'name': 'vitamin supplements',
+                                 'score': 0.7401477694511414,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000159',
+                                 'name': 'mineral supplements magnesium',
+                                 'score': 0.6225091814994812,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000228',
+                                 'name': 'mineral supplements selenium',
+                                 'score': 0.6216312646865845,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000409',
+                                 'name': 'mineral supplements copper',
+                                 'score': 0.5944932699203491,
+                                 'type': 'DSI'},
+                                {'id': 'DSI009655',
+                                 'name': 'Herbal Supplements',
+                                 'score': 0.5876369476318359,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000413',
+                                 'name': 'mineral supplements molybdenum',
+                                 'score': 0.5830625295639038,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000412',
+                                 'name': 'mineral supplements manganese',
+                                 'score': 0.5792710781097412,
+                                 'type': 'DSI'},
+                                {'id': 'DSI005576',
+                                 'name': 'Blend (Dietary substance used by man to supplement the '
+                                         'diet by increasing the total dietary intake)',
+                                 'score': 0.577666163444519,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000328',
+                                 'name': 'mineral supplements boron',
+                                 'score': 0.5755996704101562,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000418',
+                                 'name': 'mineral supplements vanadium',
+                                 'score': 0.5743656754493713,
+                                 'type': 'DSI'}],
+                 'input': {'text': 'supplements', 'type': 'DSI'}},
+                {'candidates': [{'id': 'SS000000',
+                                 'name': 'illness',
+                                 'score': 0.6769092082977295,
+                                 'type': 'SS'}],
+                 'input': {'text': 'disease', 'type': 'Disease'}}],
+ 'category': {'display': 'dietary supplement ingredients',
+              'inputs': ['supplements', 'disease'],
+              'label': 'DSI'},
+ 'mode': 'category_single',
+ 'selected': [{'input': {'text': 'supplements', 'type': 'DSI'},
+               'mapped': {'id': 'Category:DSI',
+                          'is_category': True,
+                          'name': 'supplements',
+                          'score': 1.0,
+                          'type': 'DSI'}},
+              {'input': {'text': 'disease', 'type': 'Disease'},
+               'mapped': {'id': 'Category:Disease',
+                          'is_category': True,
+                          'name': 'disease',
+                          'score': 1.0,
+                          'type': 'Disease'}},
+              {'input': {'text': "Alzheimer's disease", 'type': 'Disease'},
+               'mapped': {'id': 'DIS003570',
+                          'name': "Alzheimer's Disease",
+                          'score': 0.919377326965332,
+                          'type': 'Dis'}}]}
+
+Direct Relationship Query
+-------------------------
+{'cypher': 'MATCH (target {eDISK_ID:$target_id})\n'
+           '    MATCH (neighbor:DSI)-[r]-(target)\n'
+           '    WITH target, neighbor, r\n'
+           '    WITH\n'
+           '        target,\n'
+           '        neighbor,\n'
+           '        collect({\n'
+           '            edge_type: type(r),\n'
+           "            direction: CASE WHEN startNode(r)=target THEN 'outbound' ELSE 'inbound' "
+           'END,\n'
+           '            properties: properties(r)\n'
+           '        }) AS rels,\n'
+           '        count(r) AS rel_count,\n'
+           '        max(coalesce(r.Score, r.score, r.Confidence, r.confidence, r.Weight, r.weight, '
+           '0.0)) AS best_score,\n'
+           '        coalesce(neighbor.Name, neighbor.name, neighbor.Symbol, neighbor.Label, '
+           'neighbor.eDISK_ID, neighbor.id, neighbor.ID) AS neighbor_name\n'
+           '    RETURN {\n'
+           '        id: coalesce(neighbor.eDISK_ID, neighbor.id, neighbor.ID),\n'
+           '        name: neighbor_name,\n'
+           '        labels: labels(neighbor)\n'
+           '    } AS neighbor,\n'
+           '    rels AS relations,\n'
+           '    rel_count AS relation_count,\n'
+           '    best_score AS best_score,\n'
+           '    neighbor_name AS neighbor_name\n'
+           '    ORDER BY relation_count DESC, best_score DESC, neighbor_name\n'
+           '    LIMIT $limit',
+ 'neighbor_label': 'DSI',
+ 'params': {'limit': 5, 'target_id': 'DIS003570'}}
+
+Direct Relationship Result
+--------------------------
+[]
+
+Context Queries & Results
+-------------------------
+[]
+
+Link Prediction
+---------------
+{'backend': {'details': '[Errno 2] No such file or directory: '
+                        "'/home/laparva/visual_intelligence_lab/eDISK-main/eDISK_UI/data/pykeen_transe/training_triples.tsv'",
+             'mode': 'fallback'},
+ 'per_entity': []}
+
+Verification
+------------
+[]
+

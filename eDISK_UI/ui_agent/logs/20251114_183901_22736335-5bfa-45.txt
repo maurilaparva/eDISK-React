@@ -1,0 +1,123 @@
+Query Metadata
+--------------
+{'question': 'Please tell me about the supplement in the picture.',
+ 'relation': 'associated_with',
+ 'timestamp_utc': '20251114_183901'}
+
+Parsed Entities
+---------------
+[{'text': 'supplement', 'type': 'DSI'}]
+
+Entity Linking
+--------------
+{'candidates': [{'candidates': [{'id': 'DSP085121',
+                                 'name': 'Super Supplemental',
+                                 'score': 0.6535233855247498,
+                                 'type': 'DSP'},
+                                {'id': 'DSP085027',
+                                 'name': 'Super Supplemental',
+                                 'score': 0.6535233855247498,
+                                 'type': 'DSP'},
+                                {'id': 'D001764',
+                                 'name': 'oral supplement',
+                                 'score': 0.643912672996521,
+                                 'type': 'Drug'},
+                                {'id': 'DSP144862',
+                                 'name': 'Fiber Supplement',
+                                 'score': 0.6225262880325317,
+                                 'type': 'DSP'},
+                                {'id': 'D005191',
+                                 'name': 'trace element supplement',
+                                 'score': 0.6148082613945007,
+                                 'type': 'Drug'},
+                                {'id': 'DSP092474',
+                                 'name': 'Essential Supplement',
+                                 'score': 0.6117814183235168,
+                                 'type': 'DSP'},
+                                {'id': 'DSP028048',
+                                 'name': 'Supplement Yin',
+                                 'score': 0.5855755805969238,
+                                 'type': 'DSP'},
+                                {'id': 'DSI005576',
+                                 'name': 'Blend (Dietary substance used by man to supplement the '
+                                         'diet by increasing the total dietary intake)',
+                                 'score': 0.5832751989364624,
+                                 'type': 'DSI'},
+                                {'id': 'DSP086061',
+                                 'name': 'Surf Supplement',
+                                 'score': 0.57277512550354,
+                                 'type': 'DSP'},
+                                {'id': 'DSP138908',
+                                 'name': 'Joint Support Supplement',
+                                 'score': 0.5706408619880676,
+                                 'type': 'DSP'}],
+                 'input': {'text': 'supplement', 'type': 'DSI'}}],
+ 'category': None,
+ 'mode': 'single',
+ 'selected': [{'input': {'text': 'supplement', 'type': 'DSI'},
+               'mapped': {'id': 'DSP085121',
+                          'name': 'Super Supplemental',
+                          'score': 0.6535233855247498,
+                          'type': 'DSP'}}]}
+
+Direct Relationship Query
+-------------------------
+{}
+
+Direct Relationship Result
+--------------------------
+[]
+
+Context Queries & Results
+-------------------------
+[{'entity': {'id': 'DSP085121',
+             'name': 'Super Supplemental',
+             'score': 0.6535233855247498,
+             'type': 'DSP'},
+  'neighbors': [],
+  'queries': {'one_hop': {'cypher': 'MATCH (e {eDISK_ID:$eid})-[r]-(n)\n'
+                                    '        WHERE ($types = [] OR ANY(lbl IN labels(n) WHERE lbl '
+                                    'IN $types))\n'
+                                    '          AND ($rels = [] OR type(r) IN $rels)\n'
+                                    '        RETURN {\n'
+                                    '            neighbor_id: coalesce(n.eDISK_ID, n.id, n.ID),\n'
+                                    '            neighbor_name: coalesce(n.Name, n.name, n.Symbol, '
+                                    'n.Label, n.eDISK_ID, n.id),\n'
+                                    '            neighbor_labels: labels(n),\n'
+                                    '            relation: type(r),\n'
+                                    '            direction: CASE WHEN startNode(r)=e THEN '
+                                    "'outbound' ELSE 'inbound' END,\n"
+                                    '            relation_props: properties(r)\n'
+                                    '        } AS hop\n'
+                                    '        LIMIT $limit',
+                          'params': {'eid': 'DSP085121',
+                                     'limit': 60,
+                                     'rels': [],
+                                     'types': ['DSI',
+                                               'DSP',
+                                               'Disease',
+                                               'Drug',
+                                               'Symptom',
+                                               'Gene']}}}}]
+
+Link Prediction
+---------------
+{'backend': {'details': 'Weights only load failed. In PyTorch 2.6, we changed the default value of '
+                        'the `weights_only` argument in `torch.load` from `False` to `True`. '
+                        'Re-running `torch.load` with `weights_only` set to `False` will likely '
+                        'succeed, but it can result in arbitrary code execution. Do it only if you '
+                        'got the file from a trusted source.\n'
+                        'Please file an issue with the following so that we can make '
+                        '`weights_only=True` compatible with your use case: WeightsUnpickler '
+                        'error: Unsupported operand 149\n'
+                        '\n'
+                        'Check the documentation of torch.load to learn more about types accepted '
+                        'by default with weights_only '
+                        'https://pytorch.org/docs/stable/generated/torch.load.html.',
+             'mode': 'fallback'},
+ 'per_entity': []}
+
+Verification
+------------
+[]
+

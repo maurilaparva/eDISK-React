@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>eDISK AI Agent</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "SF Pro Display", "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 20% 20%, #eef2ff 0%, #f8fafc 45%, #fdf2f8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 20px;
+    }
+
+    .app-shell {
+      width: min(1180px, 100%);
+      height: min(720px, 90vh);
+      display: grid;
+      grid-template-columns: minmax(0, 0.58fr) minmax(0, 0.42fr);
+      gap: 20px;
+      padding: 28px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 28px 60px rgba(15, 23, 42, 0.2);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel {
+      border-radius: 22px;
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.92), rgba(241, 245, 249, 0.72));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 16px 30px rgba(15, 23, 42, 0.12);
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .chat-panel {
+      gap: 18px;
+    }
+
+    .timeline-panel {
+      gap: 16px;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .chat-header h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0.4px;
+      color: #0f172a;
+    }
+
+    .chat-header span {
+      font-size: 12px;
+      font-weight: 600;
+      color: #4338ca;
+      background: rgba(99, 102, 241, 0.16);
+      padding: 6px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .messages {
+      flex: 1;
+      min-height: 0;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.85), rgba(241, 245, 249, 0.6));
+      overflow-y: auto;
+      box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.18);
+    }
+
+    .messages::-webkit-scrollbar,
+    .timeline::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .messages::-webkit-scrollbar-thumb,
+    .timeline::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.45);
+      border-radius: 999px;
+    }
+
+    .msg {
+      max-width: 85%;
+      padding: 12px 18px;
+      border-radius: 18px;
+      margin-bottom: 14px;
+      font-size: 15px;
+      line-height: 1.6;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+      position: relative;
+      word-break: break-word;
+    }
+
+    .msg::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      width: 14px;
+      height: 14px;
+      background: inherit;
+      transform: rotate(45deg);
+      box-shadow: -2px 2px 6px rgba(15, 23, 42, 0.08);
+    }
+
+    .msg.me {
+      margin-left: auto;
+      background: linear-gradient(135deg, #c4cfff, #818cf8);
+      color: #0f172a;
+    }
+
+    .msg.me::after {
+      right: 18px;
+    }
+
+    .msg.bot {
+      margin-right: auto;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    .msg.bot::after {
+      left: 18px;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 12px;
+    }
+
+    .upload-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      border-radius: 14px;
+      border: 1px dashed rgba(99, 102, 241, 0.35);
+      background: rgba(255, 255, 255, 0.72);
+      color: #4338ca;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .upload-area:hover,
+    .upload-area.dragging {
+      border-color: rgba(99, 102, 241, 0.75);
+      background: rgba(99, 102, 241, 0.12);
+      color: #312e81;
+    }
+
+    .upload-area span {
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    .upload-area.has-file {
+      width: auto;
+      padding: 0 14px;
+      gap: 8px;
+      border-style: solid;
+      color: #1e293b;
+      background: rgba(165, 180, 252, 0.25);
+    }
+
+    .upload-area .file-name {
+      font-size: 13px;
+      white-space: nowrap;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    .upload-area .clear-attachment {
+      display: none;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .upload-area.has-file .clear-attachment {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 4px;
+      border-left: 1px solid rgba(99, 102, 241, 0.35);
+    }
+
+    .chat-input input[type="text"] {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 15px;
+      color: #0f172a;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .chat-input input:focus {
+      border-color: #6366f1;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+    }
+
+    .chat-input button {
+      padding: 0 26px;
+      border-radius: 999px;
+      border: none;
+      font-weight: 600;
+      font-size: 15px;
+      color: #ffffff;
+      background: linear-gradient(135deg, #6366f1, #4338ca);
+      cursor: pointer;
+      box-shadow: 0 12px 26px rgba(99, 102, 241, 0.32);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .chat-input button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 32px rgba(99, 102, 241, 0.4);
+    }
+
+    .timeline-panel h3 {
+      margin: 0;
+      font-size: 22px;
+      color: #1e293b;
+    }
+
+    .timeline-description {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .timeline {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-right: 6px;
+      overflow-y: auto;
+    }
+
+    .step {
+      position: relative;
+      padding: 16px 16px 16px 60px;
+      border-radius: 18px;
+      background: rgba(248, 250, 252, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .step::before {
+      content: "";
+      position: absolute;
+      left: 34px;
+      top: 12px;
+      width: 2px;
+      height: calc(100% + 14px);
+      background: linear-gradient(180deg, rgba(148, 163, 184, 0.35), rgba(148, 163, 184, 0));
+    }
+
+    .step:last-child::before {
+      display: none;
+    }
+
+    .step-icon {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      color: #94a3b8;
+      background: #e2e8f0;
+      border: 2px solid rgba(148, 163, 184, 0.5);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .step h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .step-detail {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .step.completed {
+      background: rgba(99, 102, 241, 0.12);
+      border-color: rgba(99, 102, 241, 0.42);
+      box-shadow: 0 14px 28px rgba(99, 102, 241, 0.22);
+    }
+
+    .step.completed .step-icon {
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      color: #f8fafc;
+      border-color: rgba(99, 102, 241, 0.8);
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 16px 26px rgba(99, 102, 241, 0.28);
+    }
+
+    .step.completed .step-detail {
+      color: #3730a3;
+    }
+
+    @media (max-width: 1040px) {
+      .app-shell {
+        grid-template-columns: minmax(0, 1fr);
+        height: auto;
+        row-gap: 22px;
+      }
+
+      .panel {
+        min-height: 420px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 18px 14px;
+      }
+
+      .app-shell {
+        padding: 18px;
+      }
+
+      .chat-input button {
+        padding: 0 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <section class="panel chat-panel">
+      <div class="chat-header">
+        <h2>eDISK AI Agent</h2>
+        <span>Instant Health Insights</span>
+      </div>
+      <div id="chat" class="messages"></div>
+      <form id="f" class="chat-input">
+        <div class="upload-area" id="upload-area" title="Click or drop an image">
+          <span>📎</span>
+          <span class="file-name"></span>
+          <button type="button" class="clear-attachment" aria-label="Remove image">✕</button>
+          <input id="image-input" type="file" name="image" accept="image/*" hidden>
+        </div>
+        <input type="text" name="q" placeholder="Ask me anything about supplements, diseases, genes..." autocomplete="off">
+        <button type="submit">Send</button>
+      </form>
+    </section>
+
+    <aside class="panel timeline-panel">
+      <div>
+        <h3>Task Flow</h3>
+        <p class="timeline-description">Follow the agent as it coordinates specialised tools. Each icon lights up once that capability has finished its work.</p>
+      </div>
+      <div class="timeline">
+        <div class="step" data-step="Task Intake">
+          <div class="step-icon" aria-hidden="true">📝</div>
+          <div class="step-content">
+            <h4>Task Intake</h4>
+            <p class="step-detail" data-placeholder="Waiting for your instructions.">Waiting for your instructions.</p>
+          </div>
+        </div>
+        <div class="step" data-step="Entity Mapping">
+          <div class="step-icon" aria-hidden="true">🧭</div>
+          <div class="step-content">
+            <h4>Entity Mapping</h4>
+            <p class="step-detail" data-placeholder="Aligning key entities with the eDISK knowledge graph.">Aligning key entities with the eDISK knowledge graph.</p>
+          </div>
+        </div>
+        <div class="step" data-step="Evidence Retrieval">
+          <div class="step-icon" aria-hidden="true">🔍</div>
+          <div class="step-content">
+            <h4>Evidence Retrieval</h4>
+            <p class="step-detail" data-placeholder="Querying graph relations and literature snippets.">Querying graph relations and literature snippets.</p>
+          </div>
+        </div>
+        <div class="step" data-step="Context Expansion">
+          <div class="step-icon" aria-hidden="true">🗂</div>
+          <div class="step-content">
+            <h4>Context Expansion</h4>
+            <p class="step-detail" data-placeholder="Exploring surrounding context to enrich the story.">Exploring surrounding context to enrich the story.</p>
+          </div>
+        </div>
+        <div class="step" data-step="Inference Engine">
+          <div class="step-icon" aria-hidden="true">🧠</div>
+          <div class="step-content">
+            <h4>Inference Engine</h4>
+            <p class="step-detail" data-placeholder="Running reasoning models for deeper insights.">Running reasoning models for deeper insights.</p>
+          </div>
+        </div>
+        <div class="step" data-step="Cross-Checking">
+          <div class="step-icon" aria-hidden="true">🧪</div>
+          <div class="step-content">
+            <h4>Cross-Checking</h4>
+            <p class="step-detail" data-placeholder="Verifying claims against trusted references.">Verifying claims against trusted references.</p>
+          </div>
+        </div>
+        <div class="step" data-step="Final Response">
+          <div class="step-icon" aria-hidden="true">✅</div>
+          <div class="step-content">
+            <h4>Final Response</h4>
+            <p class="step-detail" data-placeholder="Preparing the final answer for you.">Preparing the final answer for you.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const chatEl = document.getElementById('chat');
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('image-input');
+    const fileNameEl = uploadArea.querySelector('.file-name');
+    const clearAttachmentBtn = uploadArea.querySelector('.clear-attachment');
+    const stepEls = Array.from(document.querySelectorAll('.step'));
+    const stepState = stepEls.reduce((acc, el) => {
+      const name = el.dataset.step;
+      acc[name] = {
+        root: el,
+        detail: el.querySelector('.step-detail'),
+        placeholder: el.querySelector('.step-detail').dataset.placeholder
+      };
+      return acc;
+    }, {});
+
+    const STEP_SEQUENCE = stepEls.map(el => el.dataset.step);
+    const STEP_ALIASES = {
+      '1/7': 'Task Intake',
+      '2/7': 'Entity Mapping',
+      '3/7': 'Evidence Retrieval',
+      '4/7': 'Context Expansion',
+      '5/7': 'Inference Engine',
+      '6/7': 'Cross-Checking',
+      '7/7': 'Final Response',
+      'FINAL': 'Final Response',
+      'TASK INTAKE': 'Task Intake',
+      'ENTITY MAPPING': 'Entity Mapping',
+      'EVIDENCE RETRIEVAL': 'Evidence Retrieval',
+      'CONTEXT EXPANSION': 'Context Expansion',
+      'INFERENCE ENGINE': 'Inference Engine',
+      'CROSS-CHECKING': 'Cross-Checking',
+      'FINAL RESPONSE': 'Final Response'
+    };
+
+    let progressTimer = null;
+    let attachedFile = null;
+
+    function normaliseStep(label) {
+      if (!label) return null;
+      const trimmed = label.trim();
+      if (stepState[trimmed]) return trimmed;
+      if (STEP_ALIASES[trimmed]) return STEP_ALIASES[trimmed];
+      const upper = trimmed.toUpperCase();
+      if (STEP_ALIASES[upper]) return STEP_ALIASES[upper];
+      return null;
+    }
+
+    function appendMessage(role, text) {
+      const el = document.createElement('div');
+      el.className = `msg ${role}`;
+      el.textContent = text;
+      chatEl.appendChild(el);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function setAttachedFile(file) {
+      attachedFile = file || null;
+
+      uploadArea.classList.toggle('has-file', !!attachedFile);
+      fileNameEl.textContent = attachedFile ? attachedFile.name : '';
+
+      if (!attachedFile) {
+        uploadArea.classList.remove('dragging');
+      }
+    }
+
+    function renderProgress(messages) {
+      const latestByStep = {};
+      let highestIndex = -1;
+      let finalMessage = null;
+      let finalSeen = false;
+
+      (messages || []).forEach(msg => {
+        const match = msg.match(/^\[(.+?)\]\s*(.*)$/);
+        if (!match) {
+          return;
+        }
+
+        const label = match[1];
+        const detail = match[2].trim();
+        const stepName = normaliseStep(label);
+        if (!stepName) {
+          return;
+        }
+
+        const idx = STEP_SEQUENCE.indexOf(stepName);
+        if (idx === -1) {
+          return;
+        }
+
+        highestIndex = Math.max(highestIndex, idx);
+        if (detail) {
+          latestByStep[stepName] = detail;
+        }
+
+        if (label.trim().toUpperCase() === 'FINAL') {
+          finalSeen = true;
+          finalMessage = detail || 'Answer delivered.';
+        }
+      });
+
+      if (finalSeen) {
+        highestIndex = Math.max(highestIndex, STEP_SEQUENCE.length - 1);
+      }
+
+      if (highestIndex === -1) {
+        return;
+      }
+
+      stepEls.forEach((stepEl, idx) => {
+        const name = STEP_SEQUENCE[idx];
+        const state = stepState[name];
+        if (!state) return;
+
+        if (idx <= highestIndex) {
+          stepEl.classList.add('completed');
+          let detail = latestByStep[name];
+          if (!detail) {
+            if (name === 'Final Response' && finalMessage) {
+              detail = finalMessage;
+            } else {
+              detail = 'Completed.';
+            }
+          }
+          state.detail.textContent = detail;
+        } else {
+          stepEl.classList.remove('completed');
+          state.detail.textContent = state.placeholder;
+        }
+      });
+    }
+
+    async function poll(runId) {
+      const response = await fetch(`/api/progress/${runId}`);
+      const data = await response.json();
+      renderProgress(data.messages);
+
+      if (data.finished || (data.messages || []).some(m => m.includes('[DONE]'))) {
+        clearInterval(progressTimer);
+        progressTimer = null;
+      }
+    }
+
+    uploadArea.addEventListener('click', (event) => {
+      if (event.target === clearAttachmentBtn) {
+        return;
+      }
+      fileInput.click();
+    });
+
+    uploadArea.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      uploadArea.classList.add('dragging');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragging');
+    });
+
+    uploadArea.addEventListener('drop', (event) => {
+      event.preventDefault();
+      uploadArea.classList.remove('dragging');
+      const file = event.dataTransfer.files && event.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        setAttachedFile(file);
+      }
+    });
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        setAttachedFile(file);
+      } else {
+        setAttachedFile(null);
+      }
+    });
+
+    clearAttachmentBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      fileInput.value = '';
+      setAttachedFile(null);
+    });
+
+    document.getElementById('f').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const q = e.target.q.value.trim();
+      const fileForRequest = attachedFile;
+
+      if (!q && !fileForRequest) return;
+
+      const displayParts = [];
+      if (q) displayParts.push(q);
+      if (fileForRequest) displayParts.push(`[Attached image: ${fileForRequest.name}]`);
+      appendMessage('me', displayParts.join('\n\n'));
+
+      stepEls.forEach(step => {
+        step.classList.remove('completed');
+        const detailEl = step.querySelector('.step-detail');
+        detailEl.textContent = detailEl.dataset.placeholder;
+      });
+
+      if (stepState['Task Intake']) {
+        stepState['Task Intake'].root.classList.add('completed');
+        stepState['Task Intake'].detail.textContent = 'Prompt received from the user.';
+      }
+
+      if (progressTimer) {
+        clearInterval(progressTimer);
+        progressTimer = null;
+      }
+
+      const formData = new FormData();
+      formData.append('query', q);
+      if (fileForRequest) {
+        formData.append('image', fileForRequest);
+      }
+
+      const r = await fetch('/api/chat', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!r.ok) {
+        const errorPayload = await r.json().catch(() => ({}));
+        appendMessage('bot', errorPayload.error || 'Unable to process your request.');
+        return;
+      }
+
+      const data = await r.json();
+
+      progressTimer = setInterval(() => poll(data.run_id), 850);
+
+      let answer = '';
+      while (true) {
+        const rr = await fetch(`/api/progress/${data.run_id}`);
+        const resp = await rr.json();
+        const messages = resp.messages || [];
+        renderProgress(messages);
+        const finalEntry = (messages || []).find(msg => msg.startsWith('[FINAL]'));
+        if (finalEntry) {
+          answer = finalEntry.replace(/^\[FINAL\]\s*/, '').trim();
+          break;
+        }
+
+        if (resp.finished) {
+          break;
+        }
+
+        await new Promise(res => setTimeout(res, 900));
+      }
+
+      appendMessage('bot', answer || 'I was not able to generate a response.');
+      e.target.q.value = '';
+      fileInput.value = '';
+      setAttachedFile(null);
+
+      if (stepState['Final Response']) {
+        stepState['Final Response'].root.classList.add('completed');
+        if (!stepState['Final Response'].detail.textContent || stepState['Final Response'].detail.textContent === stepState['Final Response'].placeholder) {
+          stepState['Final Response'].detail.textContent = answer ? 'Answer shared with the user.' : 'Unable to craft an answer.';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+Query Metadata
+--------------
+{'question': 'What are the benefits of this kiwi nutrition label?',
+ 'relation': 'associated_with',
+ 'timestamp_utc': '20260317_000027'}
+
+Parsed Entities
+---------------
+[{'text': 'kiwi', 'type': 'DSI'}]
+
+Entity Linking
+--------------
+{'candidates': [{'candidates': [{'id': 'DSI007018',
+                                 'name': 'kiwi',
+                                 'score': 0.9999993443489075,
+                                 'type': 'DSI'},
+                                {'id': 'DSI006891',
+                                 'name': 'honeybush',
+                                 'score': 0.4504988193511963,
+                                 'type': 'DSI'},
+                                {'id': 'DSI005222',
+                                 'name': 'avocado',
+                                 'score': 0.4478713274002075,
+                                 'type': 'DSI'},
+                                {'id': 'DSI003036',
+                                 'name': 'blueberry',
+                                 'score': 0.43040189146995544,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000155',
+                                 'name': 'Wolfberry',
+                                 'score': 0.42279675602912903,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000659',
+                                 'name': 'cocos',
+                                 'score': 0.41666948795318604,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000202',
+                                 'name': 'Chinese apple',
+                                 'score': 0.4166020452976227,
+                                 'type': 'DSI'},
+                                {'id': 'DSI008921',
+                                 'name': 'Litchi',
+                                 'score': 0.4129144549369812,
+                                 'type': 'DSI'},
+                                {'id': 'DSI003424',
+                                 'name': 'fruit',
+                                 'score': 0.4119590222835541,
+                                 'type': 'DSI'},
+                                {'id': 'DSI007384',
+                                 'name': 'mayapple',
+                                 'score': 0.40958988666534424,
+                                 'type': 'DSI'}],
+                 'input': {'text': 'kiwi', 'type': 'DSI'}}],
+ 'category': None,
+ 'mode': 'single',
+ 'selected': [{'input': {'text': 'kiwi', 'type': 'DSI'},
+               'mapped': {'id': 'DSI007018',
+                          'name': 'kiwi',
+                          'score': 0.9999993443489075,
+                          'type': 'DSI'}}]}
+
+Direct Relationship Query
+-------------------------
+{}
+
+Direct Relationship Result
+--------------------------
+[]
+
+Context Queries & Results
+-------------------------
+[{'entity': {'id': 'DSI007018', 'name': 'kiwi', 'score': 0.9999993443489075, 'type': 'DSI'},
+  'neighbors': [],
+  'queries': {'one_hop': {'cypher': 'MATCH (e {eDISK_ID:$eid})-[r]-(n)\n'
+                                    '        WHERE ($types = [] OR ANY(lbl IN labels(n) WHERE lbl '
+                                    'IN $types))\n'
+                                    '          AND ($rels = [] OR type(r) IN $rels)\n'
+                                    '        RETURN {\n'
+                                    '            neighbor_id: coalesce(n.eDISK_ID, n.id, n.ID),\n'
+                                    '            neighbor_name: coalesce(n.Name, n.name, n.Symbol, '
+                                    'n.Label, n.eDISK_ID, n.id),\n'
+                                    '            neighbor_labels: labels(n),\n'
+                                    '            relation: type(r),\n'
+                                    '            direction: CASE WHEN startNode(r)=e THEN '
+                                    "'outbound' ELSE 'inbound' END,\n"
+                                    '            relation_props: properties(r)\n'
+                                    '        } AS hop\n'
+                                    '        LIMIT $limit',
+                          'params': {'eid': 'DSI007018',
+                                     'limit': 60,
+                                     'rels': [],
+                                     'types': ['DSI',
+                                               'DSP',
+                                               'Disease',
+                                               'Drug',
+                                               'Symptom',
+                                               'Gene']}}}}]
+
+Link Prediction
+---------------
+{'backend': {'details': '[Errno 2] No such file or directory: '
+                        "'/home/laparva/visual_intelligence_lab/eDISK-main/eDISK_UI/data/pykeen_transe/training_triples.tsv'",
+             'mode': 'fallback'},
+ 'per_entity': [{'backend': {'details': '[Errno 2] No such file or directory: '
+                                        "'/home/laparva/visual_intelligence_lab/eDISK-main/eDISK_UI/data/pykeen_transe/training_triples.tsv'",
+                             'mode': 'fallback'},
+                 'entity': {'id': 'DSI007018',
+                            'name': 'kiwi',
+                            'score': 0.9999993443489075,
+                            'type': 'DSI'},
+                 'head_type': 'DSI',
+                 'target_blocks': [{'candidates': [],
+                                    'method': 'graph-heuristic',
+                                    'notes': 'Ranked by direct degree',
+                                    'relation': 'has_adverse_reaction',
+                                    'target_type': 'Disease',
+                                    'uses_transe': False},
+                                   {'candidates': [],
+                                    'method': 'graph-heuristic',
+                                    'notes': 'Ranked by direct degree',
+                                    'relation': 'inhibits',
+                                    'target_type': 'Drug',
+                                    'uses_transe': False},
+                                   {'candidates': [],
+                                    'method': 'graph-heuristic',
+                                    'notes': 'Ranked by direct degree',
+                                    'relation': 'has_adverse_reaction',
+                                    'target_type': 'Symptom',
+                                    'uses_transe': False},
+                                   {'candidates': [],
+                                    'method': 'graph-heuristic',
+                                    'notes': 'Ranked by direct degree',
+                                    'relation': 'inhibits',
+                                    'target_type': 'Gene',
+                                    'uses_transe': False}]}]}
+
+Verification
+------------
+[]
+

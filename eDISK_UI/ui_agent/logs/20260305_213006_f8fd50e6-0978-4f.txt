@@ -1,0 +1,672 @@
+Query Metadata
+--------------
+{'question': "What supplements help with Alzheimer's disease?",
+ 'relation': 'associated_with',
+ 'timestamp_utc': '20260305_213006'}
+
+Parsed Entities
+---------------
+[{'text': "Alzheimer's disease", 'type': 'Disease'},
+ {'text': 'supplements', 'type': 'DSI'},
+ {'text': 'disease', 'type': 'Disease'}]
+
+Entity Linking
+--------------
+{'candidates': [{'candidates': [{'id': 'DIS003570',
+                                 'name': "Alzheimer's Disease",
+                                 'score': 0.919377326965332,
+                                 'type': 'Dis'},
+                                {'id': 'DIS001977',
+                                 'name': 'familial Alzheimer disease',
+                                 'score': 0.7066658735275269,
+                                 'type': 'Dis'},
+                                {'id': 'DIS001510',
+                                 'name': 'Dementia',
+                                 'score': 0.6989977955818176,
+                                 'type': 'Dis'},
+                                {'id': 'DIS000236',
+                                 'name': 'dementia',
+                                 'score': 0.6883754134178162,
+                                 'type': 'Dis'},
+                                {'id': 'DIS001877',
+                                 'name': 'Alzheimer Disease, Early Onset',
+                                 'score': 0.6587128639221191,
+                                 'type': 'Dis'},
+                                {'id': 'DIS000539',
+                                 'name': 'Alzheimer Disease, Late Onset',
+                                 'score': 0.6464012861251831,
+                                 'type': 'Dis'},
+                                {'id': 'DIS003603',
+                                 'name': 'Dementia, Vascular',
+                                 'score': 0.6039977669715881,
+                                 'type': 'Dis'},
+                                {'id': 'DIS002563',
+                                 'name': 'Alexander Disease',
+                                 'score': 0.6000210046768188,
+                                 'type': 'Dis'},
+                                {'id': 'DIS001485',
+                                 'name': 'Amyloid deposition',
+                                 'score': 0.5936180949211121,
+                                 'type': 'Dis'}],
+                 'input': {'text': "Alzheimer's disease", 'type': 'Disease'}},
+                {'candidates': [{'id': 'DSI008855',
+                                 'name': 'vitamin supplements',
+                                 'score': 0.7401477694511414,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000159',
+                                 'name': 'mineral supplements magnesium',
+                                 'score': 0.6225091814994812,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000228',
+                                 'name': 'mineral supplements selenium',
+                                 'score': 0.6216312646865845,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000409',
+                                 'name': 'mineral supplements copper',
+                                 'score': 0.5944932699203491,
+                                 'type': 'DSI'},
+                                {'id': 'DSI009655',
+                                 'name': 'Herbal Supplements',
+                                 'score': 0.5876369476318359,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000413',
+                                 'name': 'mineral supplements molybdenum',
+                                 'score': 0.5830625295639038,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000412',
+                                 'name': 'mineral supplements manganese',
+                                 'score': 0.5792710781097412,
+                                 'type': 'DSI'},
+                                {'id': 'DSI005576',
+                                 'name': 'Blend (Dietary substance used by man to supplement the '
+                                         'diet by increasing the total dietary intake)',
+                                 'score': 0.577666163444519,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000328',
+                                 'name': 'mineral supplements boron',
+                                 'score': 0.5755996704101562,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000418',
+                                 'name': 'mineral supplements vanadium',
+                                 'score': 0.5743656754493713,
+                                 'type': 'DSI'}],
+                 'input': {'text': 'supplements', 'type': 'DSI'}},
+                {'candidates': [{'id': 'SS000000',
+                                 'name': 'illness',
+                                 'score': 0.6769092082977295,
+                                 'type': 'SS'}],
+                 'input': {'text': 'disease', 'type': 'Disease'}}],
+ 'category': {'display': 'dietary supplement ingredients',
+              'inputs': ['supplements', 'disease'],
+              'label': 'DSI'},
+ 'mode': 'category_single',
+ 'selected': [{'input': {'text': 'supplements', 'type': 'DSI'},
+               'mapped': {'id': 'Category:DSI',
+                          'is_category': True,
+                          'name': 'supplements',
+                          'score': 1.0,
+                          'type': 'DSI'}},
+              {'input': {'text': 'disease', 'type': 'Disease'},
+               'mapped': {'id': 'Category:Disease',
+                          'is_category': True,
+                          'name': 'disease',
+                          'score': 1.0,
+                          'type': 'Disease'}},
+              {'input': {'text': "Alzheimer's disease", 'type': 'Disease'},
+               'mapped': {'id': 'DIS003570',
+                          'name': "Alzheimer's Disease",
+                          'score': 0.919377326965332,
+                          'type': 'Dis'}}]}
+
+Direct Relationship Query
+-------------------------
+{'cypher': 'MATCH (target {eDISK_ID:$target_id})\n'
+           '    MATCH (neighbor:DSI)-[r]-(target)\n'
+           '    WITH target, neighbor, r\n'
+           '    WITH\n'
+           '        target,\n'
+           '        neighbor,\n'
+           '        collect({\n'
+           '            edge_type: type(r),\n'
+           "            direction: CASE WHEN startNode(r)=target THEN 'outbound' ELSE 'inbound' "
+           'END,\n'
+           '            properties: properties(r)\n'
+           '        }) AS rels,\n'
+           '        count(r) AS rel_count,\n'
+           '        max(coalesce(r.Score, r.score, r.Confidence, r.confidence, r.Weight, r.weight, '
+           '0.0)) AS best_score,\n'
+           '        coalesce(neighbor.Name, neighbor.name, neighbor.Symbol, neighbor.Label, '
+           'neighbor.eDISK_ID, neighbor.id, neighbor.ID) AS neighbor_name\n'
+           '    RETURN {\n'
+           '        id: coalesce(neighbor.eDISK_ID, neighbor.id, neighbor.ID),\n'
+           '        name: neighbor_name,\n'
+           '        labels: labels(neighbor)\n'
+           '    } AS neighbor,\n'
+           '    rels AS relations,\n'
+           '    rel_count AS relation_count,\n'
+           '    best_score AS best_score,\n'
+           '    neighbor_name AS neighbor_name\n'
+           '    ORDER BY relation_count DESC, best_score DESC, neighbor_name\n'
+           '    LIMIT $limit',
+ 'neighbor_label': 'DSI',
+ 'params': {'limit': 5, 'target_id': 'DIS003570'}}
+
+Direct Relationship Result
+--------------------------
+[{'category_label': 'DSI',
+  'metrics': {'best_score': 'Not provided', 'relation_count': 1},
+  'neighbor': {'id': 'DSI008854', 'labels': ['DSI'], 'name': 'Goodbelly Probiotic', 'type': 'DSI'},
+  'rel_info': [{'direction': 'inbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': 'Not provided',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': 'Not provided',
+                               'Sentence': 'Not provided',
+                               'Source': 'Twitter',
+                               'Twitter': 'Intestinal Flora Balance Therapy Based on #Probiotic '
+                                          'Support Improves Cognitive Function &amp; Symptoms in '
+                                          'Patients w/ #Alzheimers Disease: A Systematic Review '
+                                          '&amp; Meta-analysis \n'
+                                          '\n'
+                                          'https://t.co/tzdUiqA7xI\n'
+                                          '\n'
+                                          '#microbiology #NPNMD #neurotwitter #brain #health '
+                                          '#healthy #AlzheimersDisease https://t.co/qwtjWaJpLE | 🧠 '
+                                          '" Intestinal flora balance therapy based on probiotic '
+                                          'support can effectively improve cognitive function, '
+                                          'instantaneous memory, and ability of daily life in '
+                                          'patients with Alzheimer\'s disease"\n'
+                                          '\n'
+                                          '⬇️',
+                               'Twitter_explanation': 'The relationship "probiotic | '
+                                                      'is_effective_for | Alzheimer" is valid '
+                                                      'based on the provided tweets, which '
+                                                      'highlight studies and articles supporting '
+                                                      'the use of probiotics in improving '
+                                                      'cognitive function and symptoms in patients '
+                                                      "with Alzheimer's disease. While the direct "
+                                                      "link between probiotics and Alzheimer's "
+                                                      'disease may not be widely known or '
+                                                      'expected, the emerging research in this '
+                                                      'area suggests a potential beneficial effect '
+                                                      'of probiotics on cognitive health.',
+                               'Twitter_frequency': '2',
+                               'Type': 'is_effective_for'}}],
+  'target': {'id': 'DIS003570',
+             'name': "Alzheimer's Disease",
+             'score': 0.919377326965332,
+             'type': 'Dis'}},
+ {'category_label': 'DSI',
+  'metrics': {'best_score': 'Not provided', 'relation_count': 1},
+  'neighbor': {'id': 'DSI005027', 'labels': ['DSI'], 'name': 'coconut oil', 'type': 'DSI'},
+  'rel_info': [{'direction': 'inbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': 'Not provided',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': 'Not provided',
+                               'Sentence': 'Not provided',
+                               'Source': 'Twitter',
+                               'Twitter': '@AlisaValdesRod1 You should checkout Dr Mary Newport’s '
+                                          'books on how she brought her husband back from the '
+                                          'brink of Alzheimer’s through diet. It’s not BS, I '
+                                          'watched a close friend do the same w her husband. '
+                                          'Ketones &amp; MCT in coconut oil. Sounds crazy, but it '
+                                          "works😉 | @DollyParton @george_vetnar Alzheimer's "
+                                          'Disease is inflammation of the brain. Much more '
+                                          'effectively than any medication, anti-inflammatory '
+                                          'foods like Curcumin (Turmeric) and Coconut Oil can put '
+                                          'out the inflammation of and even reverse AD. No one '
+                                          'needs to "live" with Alzheimer\'s! | @IamJackBoot Jack, '
+                                          'give your mom 1 tbsp. of coconut oil 3x/day. It '
+                                          'reverses and prevents dimentia and alzheimers. Doctors '
+                                          'have proven this over 20 years ago. Put it in anything '
+                                          'for her to eat.. It works. | Virgin Coconut Oil and '
+                                          "Alzheimer's Disease eBook #URWhatUEat "
+                                          'https://t.co/E1QZ83b2rV | @HealeyErika YouTube: '
+                                          'Alzheimers Disease by Dr Mary T Newport.\n'
+                                          'Coconut oil , ‘Grain Brain by David Perlmutter,MD.\n'
+                                          'Also Lions Mane powder/Ginkgo/\n'
+                                          'Low carb intake/low sugar and gluten free diet.\n'
+                                          'Exercise and playing scrabble, social group.\n'
+                                          'Ignore mistakes /encourage her. | @chrishemsworth I '
+                                          'advise you to use organic coconut oil, as it helps to '
+                                          "treat Alzheimer's Disease 👍🏼 | Coconut oil has grown in "
+                                          'popularity in recent years, amid claims that it can do '
+                                          'everything from supporting weight loss to slowing the '
+                                          'progression of Alzheimer’s disease. '
+                                          'https://t.co/2Sg1oxzHDU',
+                               'Twitter_explanation': 'The relationship between coconut oil and '
+                                                      "Alzheimer's disease has been supported by "
+                                                      'anecdotal evidence, as seen in the example '
+                                                      'tweets provided. Some individuals believe '
+                                                      'that coconut oil may have potential '
+                                                      "benefits for Alzheimer's patients, although "
+                                                      'scientific evidence is limited and more '
+                                                      'research is needed to validate these '
+                                                      'claims. Thus, the relationship is '
+                                                      'considered valid based on the existing '
+                                                      'anecdotal support.',
+                               'Twitter_frequency': '7',
+                               'Type': 'is_effective_for'}}],
+  'target': {'id': 'DIS003570',
+             'name': "Alzheimer's Disease",
+             'score': 0.919377326965332,
+             'type': 'Dis'}},
+ {'category_label': 'DSI',
+  'metrics': {'best_score': 'Not provided', 'relation_count': 1},
+  'neighbor': {'id': 'DSI008855', 'labels': ['DSI'], 'name': 'multivitamin', 'type': 'DSI'},
+  'rel_info': [{'direction': 'inbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': 'Not provided',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': 'Not provided',
+                               'Sentence': 'Not provided',
+                               'Source': 'Twitter',
+                               'Twitter': 'Latest on #Alzheimers: https://t.co/Oa8zc4WM1E A Simple '
+                                          "Multivitamin May Delay Dementia, Alzheimer's Disease - "
+                                          '- Legal Reader #Alzheimeric #dementia #Alzheimeric | '
+                                          '1.Alzheimer’s treatments are getting better.\n'
+                                          '2.Daily multivitamin may slow brain aging\n'
+                                          '3. Ice cream, candy and soda may raise the risk of '
+                                          'cognitive decline\n'
+                                          '4.Experiencing racism is linked to poor memory\n'
+                                          '5.Wearing hearing aids may reduce risk of dementia\n'
+                                          'https://t.co/vpxzFOlSED',
+                               'Twitter_explanation': 'The relationship "multivitamin | '
+                                                      'is_effective_for | Alzheimer" is considered '
+                                                      'valid based on the example supporting '
+                                                      'tweets provided. The tweets suggest that '
+                                                      'there is some belief or suggestion in the '
+                                                      'community that a multivitamin may have a '
+                                                      'positive impact on delaying dementia and '
+                                                      "Alzheimer's disease. It is worth noting "
+                                                      'that further scientific research and '
+                                                      'conclusive evidence may be necessary to '
+                                                      'fully confirm the effectiveness of '
+                                                      "multivitamins in relation to Alzheimer's "
+                                                      'disease.',
+                               'Twitter_frequency': '2',
+                               'Type': 'is_effective_for'}}],
+  'target': {'id': 'DIS003570',
+             'name': "Alzheimer's Disease",
+             'score': 0.919377326965332,
+             'type': 'Dis'}},
+ {'category_label': 'DSI',
+  'metrics': {'best_score': 'Not provided', 'relation_count': 1},
+  'neighbor': {'id': 'DSI000343', 'labels': ['DSI'], 'name': 'niacin', 'type': 'DSI'},
+  'rel_info': [{'direction': 'inbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': 'Not provided',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': 'Not provided',
+                               'Sentence': 'Not provided',
+                               'Source': 'Twitter',
+                               'Twitter': '#Niacin #supplementation contributes to the '
+                                          'amelioration of #Alzheimer’s disease in mouse models '
+                                          'Attn: \u2066@_atanas_\u2069 \u2066@_INPST\u2069 '
+                                          '\u2066@ScienceCommuni2\u2069 \u2066@DHPSP\u2069 '
+                                          '\u2066@NathanMDCunha\u2069 \u2066@NaumovskiNenad\u2069 '
+                                          '\u2066@DrPalmquist\u2069 @DocAmen  '
+                                          'https://t.co/XxL1pPn7my | In genetically altered mice '
+                                          "with an Alzheimer's trait, niacinamide corrects the "
+                                          'defect (Green, et al., 2008).\n'
+                                          '\n'
+                                          'Drugs such as atropine and antihistamines can be used '
+                                          'in crisis situations.\n'
+                                          '\n'
+                                          'Bright light, without excess ultraviolet, should be '
+                                          'available every day.',
+                               'Twitter_explanation': 'The relationship between niacin '
+                                                      'supplementation and its potential '
+                                                      "effectiveness for Alzheimer's disease is "
+                                                      'supported by evidence from studies in mouse '
+                                                      'models as mentioned in the provided tweets. '
+                                                      'Although the relationship may seem somewhat '
+                                                      'novel or unexpected to some, there is '
+                                                      'emerging research suggesting a possible '
+                                                      "link between niacin and Alzheimer's "
+                                                      'disease.',
+                               'Twitter_frequency': '2',
+                               'Type': 'is_effective_for'}}],
+  'target': {'id': 'DIS003570',
+             'name': "Alzheimer's Disease",
+             'score': 0.919377326965332,
+             'type': 'Dis'}},
+ {'category_label': 'DSI',
+  'metrics': {'best_score': 0.9471181035, 'relation_count': 1},
+  'neighbor': {'id': 'DSI009016', 'labels': ['DSI'], 'name': 'sucrose', 'type': 'DSI'},
+  'rel_info': [{'direction': 'inbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': '0.9471181035',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': '32892706',
+                               'Sentence': 'Rutaecarpine Ameliorated High Sucrose-Induced '
+                                           "Alzheimer's Disease Like Pathological and Cognitive "
+                                           'Impairments in Mice.',
+                               'Source': 'SuppKG',
+                               'Twitter': 'Not provided',
+                               'Twitter_explanation': 'Not provided',
+                               'Twitter_frequency': 'Not provided',
+                               'Type': 'Causes'}}],
+  'target': {'id': 'DIS003570',
+             'name': "Alzheimer's Disease",
+             'score': 0.919377326965332,
+             'type': 'Dis'}}]
+
+Context Queries & Results
+-------------------------
+[{'entity': {'id': 'DIS003570',
+             'name': "Alzheimer's Disease",
+             'score': 0.919377326965332,
+             'type': 'Dis'},
+  'neighbors': [],
+  'queries': {'one_hop': {'cypher': 'MATCH (e {eDISK_ID:$eid})-[r]-(n)\n'
+                                    '        WHERE ($types = [] OR ANY(lbl IN labels(n) WHERE lbl '
+                                    'IN $types))\n'
+                                    '          AND ($rels = [] OR type(r) IN $rels)\n'
+                                    '        RETURN {\n'
+                                    '            neighbor_id: coalesce(n.eDISK_ID, n.id, n.ID),\n'
+                                    '            neighbor_name: coalesce(n.Name, n.name, n.Symbol, '
+                                    'n.Label, n.eDISK_ID, n.id),\n'
+                                    '            neighbor_labels: labels(n),\n'
+                                    '            relation: type(r),\n'
+                                    '            direction: CASE WHEN startNode(r)=e THEN '
+                                    "'outbound' ELSE 'inbound' END,\n"
+                                    '            relation_props: properties(r)\n'
+                                    '        } AS hop\n'
+                                    '        LIMIT $limit',
+                          'params': {'eid': 'DIS003570',
+                                     'limit': 60,
+                                     'rels': ['is_effective_for', 'associated_with', 'Causes'],
+                                     'types': ['DSI']}}}}]
+
+Link Prediction
+---------------
+{'backend': {'details': '[Errno 2] No such file or directory: '
+                        "'/home/laparva/visual_intelligence_lab/eDISK-main/eDISK_UI/data/pykeen_transe/training_triples.tsv'",
+             'mode': 'fallback'},
+ 'per_entity': [{'backend': {'details': '[Errno 2] No such file or directory: '
+                                        "'/home/laparva/visual_intelligence_lab/eDISK-main/eDISK_UI/data/pykeen_transe/training_triples.tsv'",
+                             'mode': 'fallback'},
+                 'entity': {'id': 'DIS003570',
+                            'name': "Alzheimer's Disease",
+                            'score': 0.919377326965332,
+                            'type': 'Dis'},
+                 'head_type': 'Disease',
+                 'target_blocks': [{'candidates': [{'explanation': 'connectors: fatty acids, '
+                                                                   'gamma-aminobutyric acid, '
+                                                                   'magnesium',
+                                                    'method': 'graph-heuristic',
+                                                    'relations': ['DSI_Disease',
+                                                                  'Drug_Disease',
+                                                                  'DSI_DSI',
+                                                                  'DSI_Drug'],
+                                                    'score': 3027.0,
+                                                    'tail_id': 'DSI001506',
+                                                    'tail_name': 'Alcohol anhydrous',
+                                                    'tail_type': 'DSI'},
+                                                   {'explanation': 'connectors: gamma-aminobutyric '
+                                                                   'acid, magnesium, creatine',
+                                                    'method': 'graph-heuristic',
+                                                    'relations': ['DSI_Disease',
+                                                                  'Drug_Disease',
+                                                                  'DSI_DSI',
+                                                                  'DSI_Drug'],
+                                                    'score': 2276.0,
+                                                    'tail_id': 'DSI009217',
+                                                    'tail_name': 'Cocaine',
+                                                    'tail_type': 'DSI'},
+                                                   {'explanation': 'connectors: gamma-aminobutyric '
+                                                                   'acid, magnesium, alpha-lipoic '
+                                                                   'acid',
+                                                    'method': 'graph-heuristic',
+                                                    'relations': ['DSI_Disease',
+                                                                  'Drug_Disease',
+                                                                  'DSI_DSI',
+                                                                  'DSI_Drug'],
+                                                    'score': 2059.0,
+                                                    'tail_id': 'DSI008858',
+                                                    'tail_name': 'antioxidants',
+                                                    'tail_type': 'DSI'}],
+                                    'method': 'graph-heuristic',
+                                    'notes': 'Ranked by shared two-hop connectors',
+                                    'relation': 'is_effective_for',
+                                    'target_type': 'DSI',
+                                    'uses_transe': False}]}]}
+
+Verification
+------------
+[{'direct_relations': [],
+  'external_citations': [],
+  'predicted': {'h_id': 'DIS003570',
+                'h_name': "Alzheimer's Disease",
+                'method': 'graph-heuristic',
+                'notes': 'Ranked by shared two-hop connectors',
+                'relation': 'is_effective_for',
+                't_id': 'DSI001506',
+                't_name': 'Alcohol anhydrous',
+                'target_type': 'DSI'},
+  'support_paths': [{'citations': [{'type': 'PMID', 'value': '32829072|32829072|32829072|32829072'},
+                                   {'type': 'PMID', 'value': '24428701'}],
+                     'evidence': ['Type: is_effective_for',
+                                  'Confidence: '
+                                  '0.7330420613|0.9099832773000001|0.9174202085000001|0.9089404941',
+                                  'PubMed_ID: 32829072|32829072|32829072|32829072',
+                                  'Sentence: The objective of this review is to highlight the '
+                                  'potential of the galantamine-memantine combination to conduct '
+                                  'randomized controlled trials (RCTs) in AD.|Both galantamine and '
+                                  'memantine are FDA-approved medications for the treatment of '
+                                  'AD.|Although underutilized, the galantamine-memantine '
+                                  'combination is the standard of care in the treatment of '
+                                  'AD.|Galantamine-Memantine combination in the treatment of '
+                                  "Alzheimer's disease and beyond.",
+                                  'Source: SuppKG'],
+                     'nodes': [{'id': 'DIS003570',
+                                'labels': ['Disease'],
+                                'name': "Alzheimer's Disease"},
+                               {'id': 'D005518', 'labels': ['Drug'], 'name': 'memantine'},
+                               {'id': 'DSI001506', 'labels': ['DSI'], 'name': 'Alcohol anhydrous'}],
+                     'relations': [{'citations': [{'type': 'PMID',
+                                                   'value': '32829072|32829072|32829072|32829072'}],
+                                    'evidence': ['Type: is_effective_for',
+                                                 'Confidence: '
+                                                 '0.7330420613|0.9099832773000001|0.9174202085000001|0.9089404941',
+                                                 'PubMed_ID: 32829072|32829072|32829072|32829072',
+                                                 'Sentence: The objective of this review is to '
+                                                 'highlight the potential of the '
+                                                 'galantamine-memantine combination to conduct '
+                                                 'randomized controlled trials (RCTs) in AD.|Both '
+                                                 'galantamine and memantine are FDA-approved '
+                                                 'medications for the treatment of AD.|Although '
+                                                 'underutilized, the galantamine-memantine '
+                                                 'combination is the standard of care in the '
+                                                 'treatment of AD.|Galantamine-Memantine '
+                                                 "combination in the treatment of Alzheimer's "
+                                                 'disease and beyond.',
+                                                 'Source: SuppKG'],
+                                    'properties': {'Confidence': '0.7330420613|0.9099832773000001|0.9174202085000001|0.9089404941',
+                                                   'PubMed_ID': '32829072|32829072|32829072|32829072',
+                                                   'Sentence': 'The objective of this review is to '
+                                                               'highlight the potential of the '
+                                                               'galantamine-memantine combination '
+                                                               'to conduct randomized controlled '
+                                                               'trials (RCTs) in AD.|Both '
+                                                               'galantamine and memantine are '
+                                                               'FDA-approved medications for the '
+                                                               'treatment of AD.|Although '
+                                                               'underutilized, the '
+                                                               'galantamine-memantine combination '
+                                                               'is the standard of care in the '
+                                                               'treatment of '
+                                                               'AD.|Galantamine-Memantine '
+                                                               'combination in the treatment of '
+                                                               "Alzheimer's disease and beyond.",
+                                                   'Source': 'SuppKG',
+                                                   'Type': 'is_effective_for'},
+                                    'type': 'Drug_Disease'},
+                                   {'citations': [{'type': 'PMID', 'value': '24428701'}],
+                                    'evidence': ['Type: interacts_with',
+                                                 'Confidence: Not provided',
+                                                 'PubMed_ID: 24428701',
+                                                 'Sentence: Thus, memantine may be neuroprotective '
+                                                 'when administered during ethanol withdrawal.',
+                                                 'Source: SuppAI'],
+                                    'properties': {'Confidence': 'Not provided',
+                                                   'PubMed_ID': '24428701',
+                                                   'Sentence': 'Thus, memantine may be '
+                                                               'neuroprotective when administered '
+                                                               'during ethanol withdrawal.',
+                                                   'Source': 'SuppAI',
+                                                   'Type': 'interacts_with'},
+                                    'type': 'DSI_Drug'}],
+                     'summary': "-Drug_Disease→ Alzheimer's Disease -DSI_Drug→ memantine"},
+                    {'citations': [{'type': 'PMID', 'value': '32829072|32829072|32829072|32829072'},
+                                   {'type': 'PMID', 'value': '9754913'}],
+                     'evidence': ['Type: is_effective_for',
+                                  'Confidence: '
+                                  '0.7330420613|0.9099832773000001|0.9174202085000001|0.9089404941',
+                                  'PubMed_ID: 32829072|32829072|32829072|32829072',
+                                  'Sentence: The objective of this review is to highlight the '
+                                  'potential of the galantamine-memantine combination to conduct '
+                                  'randomized controlled trials (RCTs) in AD.|Both galantamine and '
+                                  'memantine are FDA-approved medications for the treatment of '
+                                  'AD.|Although underutilized, the galantamine-memantine '
+                                  'combination is the standard of care in the treatment of '
+                                  'AD.|Galantamine-Memantine combination in the treatment of '
+                                  "Alzheimer's disease and beyond.",
+                                  'Source: SuppKG'],
+                     'nodes': [{'id': 'DIS003570',
+                                'labels': ['Disease'],
+                                'name': "Alzheimer's Disease"},
+                               {'id': 'D005518', 'labels': ['Drug'], 'name': 'memantine'},
+                               {'id': 'DSI001506', 'labels': ['DSI'], 'name': 'Alcohol anhydrous'}],
+                     'relations': [{'citations': [{'type': 'PMID',
+                                                   'value': '32829072|32829072|32829072|32829072'}],
+                                    'evidence': ['Type: is_effective_for',
+                                                 'Confidence: '
+                                                 '0.7330420613|0.9099832773000001|0.9174202085000001|0.9089404941',
+                                                 'PubMed_ID: 32829072|32829072|32829072|32829072',
+                                                 'Sentence: The objective of this review is to '
+                                                 'highlight the potential of the '
+                                                 'galantamine-memantine combination to conduct '
+                                                 'randomized controlled trials (RCTs) in AD.|Both '
+                                                 'galantamine and memantine are FDA-approved '
+                                                 'medications for the treatment of AD.|Although '
+                                                 'underutilized, the galantamine-memantine '
+                                                 'combination is the standard of care in the '
+                                                 'treatment of AD.|Galantamine-Memantine '
+                                                 "combination in the treatment of Alzheimer's "
+                                                 'disease and beyond.',
+                                                 'Source: SuppKG'],
+                                    'properties': {'Confidence': '0.7330420613|0.9099832773000001|0.9174202085000001|0.9089404941',
+                                                   'PubMed_ID': '32829072|32829072|32829072|32829072',
+                                                   'Sentence': 'The objective of this review is to '
+                                                               'highlight the potential of the '
+                                                               'galantamine-memantine combination '
+                                                               'to conduct randomized controlled '
+                                                               'trials (RCTs) in AD.|Both '
+                                                               'galantamine and memantine are '
+                                                               'FDA-approved medications for the '
+                                                               'treatment of AD.|Although '
+                                                               'underutilized, the '
+                                                               'galantamine-memantine combination '
+                                                               'is the standard of care in the '
+                                                               'treatment of '
+                                                               'AD.|Galantamine-Memantine '
+                                                               'combination in the treatment of '
+                                                               "Alzheimer's disease and beyond.",
+                                                   'Source': 'SuppKG',
+                                                   'Type': 'is_effective_for'},
+                                    'type': 'Drug_Disease'},
+                                   {'citations': [{'type': 'PMID', 'value': '9754913'}],
+                                    'evidence': ['Type: interacts_with',
+                                                 'Confidence: Not provided',
+                                                 'PubMed_ID: 9754913',
+                                                 'Sentence: However, only 6 mg/kg memantine '
+                                                 'selectively decreased ethanol drinking.',
+                                                 'Source: SuppAI'],
+                                    'properties': {'Confidence': 'Not provided',
+                                                   'PubMed_ID': '9754913',
+                                                   'Sentence': 'However, only 6 mg/kg memantine '
+                                                               'selectively decreased ethanol '
+                                                               'drinking.',
+                                                   'Source': 'SuppAI',
+                                                   'Type': 'interacts_with'},
+                                    'type': 'DSI_Drug'}],
+                     'summary': "-Drug_Disease→ Alzheimer's Disease -DSI_Drug→ memantine"},
+                    {'citations': [{'type': 'PMID', 'value': '32829072|32829072|32829072|32829072'},
+                                   {'type': 'PMID', 'value': '16835770'}],
+                     'evidence': ['Type: is_effective_for',
+                                  'Confidence: '
+                                  '0.7330420613|0.9099832773000001|0.9174202085000001|0.9089404941',
+                                  'PubMed_ID: 32829072|32829072|32829072|32829072',
+                                  'Sentence: The objective of this review is to highlight the '
+                                  'potential of the galantamine-memantine combination to conduct '
+                                  'randomized controlled trials (RCTs) in AD.|Both galantamine and '
+                                  'memantine are FDA-approved medications for the treatment of '
+                                  'AD.|Although underutilized, the galantamine-memantine '
+                                  'combination is the standard of care in the treatment of '
+                                  'AD.|Galantamine-Memantine combination in the treatment of '
+                                  "Alzheimer's disease and beyond.",
+                                  'Source: SuppKG'],
+                     'nodes': [{'id': 'DIS003570',
+                                'labels': ['Disease'],
+                                'name': "Alzheimer's Disease"},
+                               {'id': 'D005518', 'labels': ['Drug'], 'name': 'memantine'},
+                               {'id': 'DSI001506', 'labels': ['DSI'], 'name': 'Alcohol anhydrous'}],
+                     'relations': [{'citations': [{'type': 'PMID',
+                                                   'value': '32829072|32829072|32829072|32829072'}],
+                                    'evidence': ['Type: is_effective_for',
+                                                 'Confidence: '
+                                                 '0.7330420613|0.9099832773000001|0.9174202085000001|0.9089404941',
+                                                 'PubMed_ID: 32829072|32829072|32829072|32829072',
+                                                 'Sentence: The objective of this review is to '
+                                                 'highlight the potential of the '
+                                                 'galantamine-memantine combination to conduct '
+                                                 'randomized controlled trials (RCTs) in AD.|Both '
+                                                 'galantamine and memantine are FDA-approved '
+                                                 'medications for the treatment of AD.|Although '
+                                                 'underutilized, the galantamine-memantine '
+                                                 'combination is the standard of care in the '
+                                                 'treatment of AD.|Galantamine-Memantine '
+                                                 "combination in the treatment of Alzheimer's "
+                                                 'disease and beyond.',
+                                                 'Source: SuppKG'],
+                                    'properties': {'Confidence': '0.7330420613|0.9099832773000001|0.9174202085000001|0.9089404941',
+                                                   'PubMed_ID': '32829072|32829072|32829072|32829072',
+                                                   'Sentence': 'The objective of this review is to '
+                                                               'highlight the potential of the '
+                                                               'galantamine-memantine combination '
+                                                               'to conduct randomized controlled '
+                                                               'trials (RCTs) in AD.|Both '
+                                                               'galantamine and memantine are '
+                                                               'FDA-approved medications for the '
+                                                               'treatment of AD.|Although '
+                                                               'underutilized, the '
+                                                               'galantamine-memantine combination '
+                                                               'is the standard of care in the '
+                                                               'treatment of '
+                                                               'AD.|Galantamine-Memantine '
+                                                               'combination in the treatment of '
+                                                               "Alzheimer's disease and beyond.",
+                                                   'Source': 'SuppKG',
+                                                   'Type': 'is_effective_for'},
+                                    'type': 'Drug_Disease'},
+                                   {'citations': [{'type': 'PMID', 'value': '16835770'}],
+                                    'evidence': ['Type: interacts_with',
+                                                 'Confidence: Not provided',
+                                                 'PubMed_ID: 16835770',
+                                                 'Sentence: Memantine increased locomotion during '
+                                                 'alcohol SIP (25 mg/kg) and during water SIP (5 '
+                                                 'and 25 mg/kg).',
+                                                 'Source: SuppAI'],
+                                    'properties': {'Confidence': 'Not provided',
+                                                   'PubMed_ID': '16835770',
+                                                   'Sentence': 'Memantine increased locomotion '
+                                                               'during alcohol SIP (25 mg/kg) and '
+                                                               'during water SIP (5 and 25 mg/kg).',
+                                                   'Source': 'SuppAI',
+                                                   'Type': 'interacts_with'},
+                                    'type': 'DSI_Drug'}],
+                     'summary': "-Drug_Disease→ Alzheimer's Disease -DSI_Drug→ memantine"}]}]
+

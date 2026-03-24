@@ -1,0 +1,537 @@
+Query Metadata
+--------------
+{'question': 'What other conditions is ginkgo effective for?',
+ 'relation': 'associated_with',
+ 'timestamp_utc': '20260306_020814'}
+
+Parsed Entities
+---------------
+[{'text': 'ginkgo', 'type': 'DSI'}, {'text': 'conditions', 'type': 'Disease'}]
+
+Entity Linking
+--------------
+{'candidates': [{'candidates': [{'id': 'DSI000108',
+                                 'name': 'ginkgo',
+                                 'score': 0.9999994039535522,
+                                 'type': 'DSI'},
+                                {'id': 'DSI010229',
+                                 'name': 'ginkgo',
+                                 'score': 0.9999994039535522,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000330',
+                                 'name': 'ginkgo biloba',
+                                 'score': 0.8802544474601746,
+                                 'type': 'DSI'},
+                                {'id': 'DSI004905',
+                                 'name': 'ginkgo biloba leaf',
+                                 'score': 0.8084192276000977,
+                                 'type': 'DSI'},
+                                {'id': 'DSI006663',
+                                 'name': 'ginkgolide',
+                                 'score': 0.7465424537658691,
+                                 'type': 'DSI'},
+                                {'id': 'DSI006687',
+                                 'name': 'Ginkgoside',
+                                 'score': 0.7450937032699585,
+                                 'type': 'DSI'},
+                                {'id': 'DSI006735',
+                                 'name': 'ginkgolide A',
+                                 'score': 0.6906002759933472,
+                                 'type': 'DSI'},
+                                {'id': 'DSI006686',
+                                 'name': 'ginkgolide B',
+                                 'score': 0.6884363293647766,
+                                 'type': 'DSI'}],
+                 'input': {'text': 'ginkgo', 'type': 'DSI'}},
+                {'candidates': [{'id': 'DIS001041',
+                                 'name': 'Climate',
+                                 'score': 0.5315700173377991,
+                                 'type': 'Dis'},
+                                {'id': 'DSP131539',
+                                 'name': 'Control',
+                                 'score': 0.4975084662437439,
+                                 'type': 'DSP'},
+                                {'id': 'DSP125364',
+                                 'name': 'Control',
+                                 'score': 0.4975084662437439,
+                                 'type': 'DSP'},
+                                {'id': 'DSP075753',
+                                 'name': 'Control',
+                                 'score': 0.4975084662437439,
+                                 'type': 'DSP'},
+                                {'id': 'DSP040837',
+                                 'name': 'Control',
+                                 'score': 0.4975084662437439,
+                                 'type': 'DSP'},
+                                {'id': 'DSP118121',
+                                 'name': 'Status',
+                                 'score': 0.4943479597568512,
+                                 'type': 'DSP'},
+                                {'id': 'DSP126686',
+                                 'name': 'Connection',
+                                 'score': 0.4908140301704407,
+                                 'type': 'DSP'},
+                                {'id': 'DSP084917',
+                                 'name': 'Threshold',
+                                 'score': 0.4880017936229706,
+                                 'type': 'DSP'},
+                                {'id': 'DSI009345',
+                                 'name': 'Ensure',
+                                 'score': 0.48187845945358276,
+                                 'type': 'DSI'},
+                                {'id': 'DIS000517',
+                                 'name': 'Weather',
+                                 'score': 0.4790623188018799,
+                                 'type': 'Dis'}],
+                 'input': {'text': 'conditions', 'type': 'Disease'}}],
+ 'category': {'display': 'diseases', 'inputs': ['conditions'], 'label': 'Disease'},
+ 'mode': 'category_single',
+ 'selected': [{'input': {'text': 'conditions', 'type': 'Disease'},
+               'mapped': {'id': 'Category:Disease',
+                          'is_category': True,
+                          'name': 'conditions',
+                          'score': 1.0,
+                          'type': 'Disease'}},
+              {'input': {'text': 'ginkgo', 'type': 'DSI'},
+               'mapped': {'id': 'DSI000108',
+                          'name': 'ginkgo',
+                          'score': 0.9999994039535522,
+                          'type': 'DSI'}}]}
+
+Direct Relationship Query
+-------------------------
+{'cypher': 'MATCH (target {eDISK_ID:$target_id})\n'
+           '    MATCH (neighbor:Disease)-[r]-(target)\n'
+           '    WITH target, neighbor, r\n'
+           '    WITH\n'
+           '        target,\n'
+           '        neighbor,\n'
+           '        collect({\n'
+           '            edge_type: type(r),\n'
+           "            direction: CASE WHEN startNode(r)=target THEN 'outbound' ELSE 'inbound' "
+           'END,\n'
+           '            properties: properties(r)\n'
+           '        }) AS rels,\n'
+           '        count(r) AS rel_count,\n'
+           '        max(coalesce(r.Score, r.score, r.Confidence, r.confidence, r.Weight, r.weight, '
+           '0.0)) AS best_score,\n'
+           '        coalesce(neighbor.Name, neighbor.name, neighbor.Symbol, neighbor.Label, '
+           'neighbor.eDISK_ID, neighbor.id, neighbor.ID) AS neighbor_name\n'
+           '    RETURN {\n'
+           '        id: coalesce(neighbor.eDISK_ID, neighbor.id, neighbor.ID),\n'
+           '        name: neighbor_name,\n'
+           '        labels: labels(neighbor)\n'
+           '    } AS neighbor,\n'
+           '    rels AS relations,\n'
+           '    rel_count AS relation_count,\n'
+           '    best_score AS best_score,\n'
+           '    neighbor_name AS neighbor_name\n'
+           '    ORDER BY relation_count DESC, best_score DESC, neighbor_name\n'
+           '    LIMIT $limit',
+ 'neighbor_label': 'Disease',
+ 'params': {'limit': 5, 'target_id': 'DSI000108'}}
+
+Direct Relationship Result
+--------------------------
+[{'category_label': 'Disease',
+  'metrics': {'best_score': 'Not provided', 'relation_count': 1},
+  'neighbor': {'id': 'DIS000052',
+               'labels': ['Disease'],
+               'name': 'circulatory disorders',
+               'type': 'Disease'},
+  'rel_info': [{'direction': 'outbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': 'Not provided',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': 'Not provided',
+                               'Sentence': 'Not provided',
+                               'Source': 'MSKCC',
+                               'Twitter': 'Not provided',
+                               'Twitter_explanation': 'Not provided',
+                               'Twitter_frequency': 'Not provided',
+                               'Type': 'is_effective_for'}}],
+  'target': {'id': 'DSI000108', 'name': 'ginkgo', 'score': 0.9999994039535522, 'type': 'DSI'}},
+ {'category_label': 'Disease',
+  'metrics': {'best_score': 'Not provided', 'relation_count': 1},
+  'neighbor': {'id': 'DIS000134', 'labels': ['Disease'], 'name': 'memory loss', 'type': 'Disease'},
+  'rel_info': [{'direction': 'outbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': 'Not provided',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': 'Not provided',
+                               'Sentence': 'Not provided',
+                               'Source': 'MSKCC',
+                               'Twitter': 'Not provided',
+                               'Twitter_explanation': 'Not provided',
+                               'Twitter_frequency': 'Not provided',
+                               'Type': 'is_effective_for'}}],
+  'target': {'id': 'DSI000108', 'name': 'ginkgo', 'score': 0.9999994039535522, 'type': 'DSI'}},
+ {'category_label': 'Disease',
+  'metrics': {'best_score': 0.9413903356000001, 'relation_count': 1},
+  'neighbor': {'id': 'DIS000253', 'labels': ['Disease'], 'name': 'Hyperplasia', 'type': 'Disease'},
+  'rel_info': [{'direction': 'outbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': '0.9413903356000001',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': '16651744',
+                               'Sentence': 'By histological comparison, ginkgetin was also found '
+                                           'to reduce epidermal hyperplasia.',
+                               'Source': 'SuppKG',
+                               'Twitter': 'Not provided',
+                               'Twitter_explanation': 'Not provided',
+                               'Twitter_frequency': 'Not provided',
+                               'Type': 'is_effective_for'}}],
+  'target': {'id': 'DSI000108', 'name': 'ginkgo', 'score': 0.9999994039535522, 'type': 'DSI'}},
+ {'category_label': 'Disease',
+  'metrics': {'best_score': 0.9391760826000001, 'relation_count': 1},
+  'neighbor': {'id': 'DIS003840',
+               'labels': ['Disease'],
+               'name': 'Injury of liver',
+               'type': 'Disease'},
+  'rel_info': [{'direction': 'outbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': '0.9391760826000001',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': '18186586',
+                               'Sentence': 'Protective effects of Ginkgo biloba, Panax ginseng, '
+                                           'and Schizandra chinensis extract on liver injury in '
+                                           'rats.',
+                               'Source': 'SuppKG',
+                               'Twitter': 'Not provided',
+                               'Twitter_explanation': 'Not provided',
+                               'Twitter_frequency': 'Not provided',
+                               'Type': 'is_effective_for'}}],
+  'target': {'id': 'DSI000108', 'name': 'ginkgo', 'score': 0.9999994039535522, 'type': 'DSI'}},
+ {'category_label': 'Disease',
+  'metrics': {'best_score': '0.9358181953|0.7921434045', 'relation_count': 1},
+  'neighbor': {'id': 'DIS002001',
+               'labels': ['Disease'],
+               'name': 'Essential Hypertension',
+               'type': 'Disease'},
+  'rel_info': [{'direction': 'outbound',
+                'edge_type': 'DSI_Disease',
+                'properties': {'Confidence': '0.9358181953|0.7921434045',
+                               'DDSAE_count': 'Not provided',
+                               'PubMed_ID': '24877716|24877716',
+                               'Sentence': 'Ginkgo biloba extract (GBE), a traditional natural '
+                                           'herbal product, is often used in the treatment of '
+                                           'essential hypertension (EH) as complementary therapy '
+                                           'in China and European countries.|Ginkgo biloba extract '
+                                           'for essential hypertension: a systemic review.',
+                               'Source': 'SuppKG',
+                               'Twitter': 'Not provided',
+                               'Twitter_explanation': 'Not provided',
+                               'Twitter_frequency': 'Not provided',
+                               'Type': 'is_effective_for'}}],
+  'target': {'id': 'DSI000108', 'name': 'ginkgo', 'score': 0.9999994039535522, 'type': 'DSI'}}]
+
+Context Queries & Results
+-------------------------
+[{'entity': {'id': 'DSI000108', 'name': 'ginkgo', 'score': 0.9999994039535522, 'type': 'DSI'},
+  'neighbors': [],
+  'queries': {'one_hop': {'cypher': 'MATCH (e {eDISK_ID:$eid})-[r]-(n)\n'
+                                    '        WHERE ($types = [] OR ANY(lbl IN labels(n) WHERE lbl '
+                                    'IN $types))\n'
+                                    '          AND ($rels = [] OR type(r) IN $rels)\n'
+                                    '        RETURN {\n'
+                                    '            neighbor_id: coalesce(n.eDISK_ID, n.id, n.ID),\n'
+                                    '            neighbor_name: coalesce(n.Name, n.name, n.Symbol, '
+                                    'n.Label, n.eDISK_ID, n.id),\n'
+                                    '            neighbor_labels: labels(n),\n'
+                                    '            relation: type(r),\n'
+                                    '            direction: CASE WHEN startNode(r)=e THEN '
+                                    "'outbound' ELSE 'inbound' END,\n"
+                                    '            relation_props: properties(r)\n'
+                                    '        } AS hop\n'
+                                    '        LIMIT $limit',
+                          'params': {'eid': 'DSI000108',
+                                     'limit': 60,
+                                     'rels': ['is_effective_for', 'associated_with', 'Causes'],
+                                     'types': ['Disease']}}}}]
+
+Link Prediction
+---------------
+{'backend': {'details': '[Errno 2] No such file or directory: '
+                        "'/home/laparva/visual_intelligence_lab/eDISK-main/eDISK_UI/data/pykeen_transe/training_triples.tsv'",
+             'mode': 'fallback'},
+ 'per_entity': [{'backend': {'details': '[Errno 2] No such file or directory: '
+                                        "'/home/laparva/visual_intelligence_lab/eDISK-main/eDISK_UI/data/pykeen_transe/training_triples.tsv'",
+                             'mode': 'fallback'},
+                 'entity': {'id': 'DSI000108',
+                            'name': 'ginkgo',
+                            'score': 0.9999994039535522,
+                            'type': 'DSI'},
+                 'head_type': 'DSI',
+                 'target_blocks': [{'candidates': [{'explanation': 'connectors: Epimedium '
+                                                                   'grandiflorum, diet, histamine',
+                                                    'method': 'graph-heuristic',
+                                                    'relations': ['DSI_DSI',
+                                                                  'DSI_Gene',
+                                                                  'DSI_Drug',
+                                                                  'DSI_Disease',
+                                                                  'Disease_Gene',
+                                                                  'Drug_Disease'],
+                                                    'score': 13.0,
+                                                    'tail_id': 'DIS000027',
+                                                    'tail_name': 'inflammation',
+                                                    'tail_type': 'Disease'},
+                                                   {'explanation': 'connectors: diet, acetate, '
+                                                                   'histamine',
+                                                    'method': 'graph-heuristic',
+                                                    'relations': ['DSI_DSI',
+                                                                  'DSI_Drug',
+                                                                  'DSI_Disease',
+                                                                  'Drug_Disease'],
+                                                    'score': 7.0,
+                                                    'tail_id': 'DIS003641',
+                                                    'tail_name': 'Carcinogenesis',
+                                                    'tail_type': 'Disease'},
+                                                   {'explanation': 'connectors: diet, histamine, '
+                                                                   'Digestive Enzymes',
+                                                    'method': 'graph-heuristic',
+                                                    'relations': ['DSI_DSI',
+                                                                  'DSI_Drug',
+                                                                  'DSI_Disease',
+                                                                  'Drug_Disease'],
+                                                    'score': 6.0,
+                                                    'tail_id': 'DIS001317',
+                                                    'tail_name': 'Neoplasms',
+                                                    'tail_type': 'Disease'}],
+                                    'method': 'graph-heuristic',
+                                    'notes': 'Ranked by shared two-hop connectors',
+                                    'relation': 'is_effective_for',
+                                    'target_type': 'Disease',
+                                    'uses_transe': False}]}]}
+
+Verification
+------------
+[{'direct_relations': [],
+  'external_citations': [],
+  'predicted': {'h_id': 'DSI000108',
+                'h_name': 'ginkgo',
+                'method': 'graph-heuristic',
+                'notes': 'Ranked by shared two-hop connectors',
+                'relation': 'is_effective_for',
+                't_id': 'DIS000027',
+                't_name': 'inflammation',
+                'target_type': 'Disease'},
+  'support_paths': [{'citations': [{'type': 'PMID', 'value': '17110111'},
+                                   {'type': 'PMID', 'value': '24054487'}],
+                     'evidence': ['Type: inhibits',
+                                  'Confidence: 0.9386708736',
+                                  'PubMed_ID: 17110111',
+                                  'Sentence: Ginkgetin was found to inhibit the influenza virus '
+                                  'sialidase.',
+                                  'Source: SuppKG'],
+                     'nodes': [{'id': 'DSI000108', 'labels': ['DSI'], 'name': 'ginkgo'},
+                               {'id': 'D001625', 'labels': ['Drug'], 'name': 'Neuraminidase'},
+                               {'id': 'DIS000027', 'labels': ['Disease'], 'name': 'inflammation'}],
+                     'relations': [{'citations': [{'type': 'PMID', 'value': '17110111'}],
+                                    'evidence': ['Type: inhibits',
+                                                 'Confidence: 0.9386708736',
+                                                 'PubMed_ID: 17110111',
+                                                 'Sentence: Ginkgetin was found to inhibit the '
+                                                 'influenza virus sialidase.',
+                                                 'Source: SuppKG'],
+                                    'properties': {'Confidence': '0.9386708736',
+                                                   'PubMed_ID': '17110111',
+                                                   'Sentence': 'Ginkgetin was found to inhibit the '
+                                                               'influenza virus sialidase.',
+                                                   'Source': 'SuppKG',
+                                                   'Type': 'inhibits'},
+                                    'type': 'DSI_Drug'},
+                                   {'citations': [{'type': 'PMID', 'value': '24054487'}],
+                                    'evidence': ['Type: associated_with',
+                                                 'Confidence: 0.9152697325',
+                                                 'PubMed_ID: 24054487',
+                                                 'Sentence: Bacterial neuraminidase (NA) is one of '
+                                                 'the key enzymes involved in pathogenesis of '
+                                                 'inflammation during infection.',
+                                                 'Source: SuppKG'],
+                                    'properties': {'Confidence': '0.9152697325',
+                                                   'PubMed_ID': '24054487',
+                                                   'Sentence': 'Bacterial neuraminidase (NA) is '
+                                                               'one of the key enzymes involved in '
+                                                               'pathogenesis of inflammation '
+                                                               'during infection.',
+                                                   'Source': 'SuppKG',
+                                                   'Type': 'associated_with'},
+                                    'type': 'Drug_Disease'}],
+                     'summary': '-DSI_Drug→ ginkgo -Drug_Disease→ Neuraminidase'},
+                    {'citations': [{'type': 'PMID', 'value': '28707415'},
+                                   {'type': 'PMID', 'value': '20731354|20731354|23566359'}],
+                     'evidence': ['Type: inhibits',
+                                  'Confidence: 0.6601384282',
+                                  'PubMed_ID: 28707415',
+                                  'Twitter_explanation: Not provided',
+                                  'Twitter: Not provided'],
+                     'nodes': [{'id': 'DSI000108', 'labels': ['DSI'], 'name': 'ginkgo'},
+                               {'id': 'DSI004100', 'labels': ['DSI'], 'name': 'acetate'},
+                               {'id': 'DIS000027', 'labels': ['Disease'], 'name': 'inflammation'}],
+                     'relations': [{'citations': [{'type': 'PMID', 'value': '28707415'}],
+                                    'evidence': ['Type: inhibits',
+                                                 'Confidence: 0.6601384282',
+                                                 'PubMed_ID: 28707415',
+                                                 'Twitter_explanation: Not provided',
+                                                 'Twitter: Not provided',
+                                                 'Twitter_frequency: Not provided',
+                                                 'Sentence: However, ginkgo extract increased '
+                                                 'propionate proportion and decreased acetate '
+                                                 'proportion in all dietary conditions tested.',
+                                                 'Source: SuppKG'],
+                                    'properties': {'Confidence': '0.6601384282',
+                                                   'PubMed_ID': '28707415',
+                                                   'Sentence': 'However, ginkgo extract increased '
+                                                               'propionate proportion and '
+                                                               'decreased acetate proportion in '
+                                                               'all dietary conditions tested.',
+                                                   'Source': 'SuppKG',
+                                                   'Twitter': 'Not provided',
+                                                   'Twitter_explanation': 'Not provided',
+                                                   'Twitter_frequency': 'Not provided',
+                                                   'Type': 'inhibits'},
+                                    'type': 'DSI_DSI'},
+                                   {'citations': [{'type': 'PMID',
+                                                   'value': '20731354|20731354|23566359'}],
+                                    'evidence': ['Type: Causes',
+                                                 'Confidence: '
+                                                 '0.9347487092000001|0.9342257977|0.9271405339000001',
+                                                 'DDSAE_count: Not provided',
+                                                 'PubMed_ID: 20731354|20731354|23566359',
+                                                 'Twitter: Not provided',
+                                                 'Twitter_explanation: Not provided',
+                                                 'Twitter_frequency: Not provided',
+                                                 'Sentence: Topical application of TPA to ears of '
+                                                 'CD-1 mice induced inflammation accompanied with '
+                                                 'substantial increase in TNF-alpha, IL-1beta, '
+                                                 'IL-6, LTB4, and PGE2 levels and an elevation in '
+                                                 'intercellular adhesion molecule-1 (ICAM-1) gene '
+                                                 'expressions in ear skin tissues.|Intraperitoneal '
+                                                 'injection of black rice bran extract prior to '
+                                                 'TPA application in mice significantly suppressed '
+                                                 'TPA-induced inflammation (edema) and induced a '
+                                                 'marked decrease in the production of TNF-alpha, '
+                                                 'IL-1beta, IL-6, and LTB4.|The present study '
+                                                 'indicates that agarwood oil significantly '
+                                                 'reduced the skin thickness, ear weight, '
+                                                 'oxidative stress and pro-inflammatory cytokines '
+                                                 'production in TPA-induced mouse ear inflammation '
+                                                 'model and contributed towards validation of its '
+                                                 'traditional use to treat inflammation related '
+                                                 'ailments.',
+                                                 'Source: SuppKG'],
+                                    'properties': {'Confidence': '0.9347487092000001|0.9342257977|0.9271405339000001',
+                                                   'DDSAE_count': 'Not provided',
+                                                   'PubMed_ID': '20731354|20731354|23566359',
+                                                   'Sentence': 'Topical application of TPA to ears '
+                                                               'of CD-1 mice induced inflammation '
+                                                               'accompanied with substantial '
+                                                               'increase in TNF-alpha, IL-1beta, '
+                                                               'IL-6, LTB4, and PGE2 levels and an '
+                                                               'elevation in intercellular '
+                                                               'adhesion molecule-1 (ICAM-1) gene '
+                                                               'expressions in ear skin '
+                                                               'tissues.|Intraperitoneal injection '
+                                                               'of black rice bran extract prior '
+                                                               'to TPA application in mice '
+                                                               'significantly suppressed '
+                                                               'TPA-induced inflammation (edema) '
+                                                               'and induced a marked decrease in '
+                                                               'the production of TNF-alpha, '
+                                                               'IL-1beta, IL-6, and LTB4.|The '
+                                                               'present study indicates that '
+                                                               'agarwood oil significantly reduced '
+                                                               'the skin thickness, ear weight, '
+                                                               'oxidative stress and '
+                                                               'pro-inflammatory cytokines '
+                                                               'production in TPA-induced mouse '
+                                                               'ear inflammation model and '
+                                                               'contributed towards validation of '
+                                                               'its traditional use to treat '
+                                                               'inflammation related ailments.',
+                                                   'Source': 'SuppKG',
+                                                   'Twitter': 'Not provided',
+                                                   'Twitter_explanation': 'Not provided',
+                                                   'Twitter_frequency': 'Not provided',
+                                                   'Type': 'Causes'},
+                                    'type': 'DSI_Disease'}],
+                     'summary': '-DSI_DSI→ ginkgo -DSI_Disease→ acetate'},
+                    {'citations': [{'type': 'PMID', 'value': '26975469'},
+                                   {'type': 'PMID', 'value': '28913553 | 24507159|31392409'}],
+                     'evidence': ['Type: interacts_with',
+                                  'Confidence: 0.9294402599',
+                                  'PubMed_ID: 26975469',
+                                  'Sentence: We selected from literature 20 promising Ginkgo '
+                                  'biloba compounds, and tested them for their potential ability '
+                                  'to bind chymase enzyme using docking and a deep analysis of '
+                                  'surface pocket features.',
+                                  'Source: SuppKG'],
+                     'nodes': [{'id': 'DSI000108', 'labels': ['DSI'], 'name': 'ginkgo'},
+                               {'id': 'D004829', 'labels': ['Drug'], 'name': 'Chymase'},
+                               {'id': 'DIS000027', 'labels': ['Disease'], 'name': 'inflammation'}],
+                     'relations': [{'citations': [{'type': 'PMID', 'value': '26975469'}],
+                                    'evidence': ['Type: interacts_with',
+                                                 'Confidence: 0.9294402599',
+                                                 'PubMed_ID: 26975469',
+                                                 'Sentence: We selected from literature 20 '
+                                                 'promising Ginkgo biloba compounds, and tested '
+                                                 'them for their potential ability to bind chymase '
+                                                 'enzyme using docking and a deep analysis of '
+                                                 'surface pocket features.',
+                                                 'Source: SuppKG'],
+                                    'properties': {'Confidence': '0.9294402599',
+                                                   'PubMed_ID': '26975469',
+                                                   'Sentence': 'We selected from literature 20 '
+                                                               'promising Ginkgo biloba compounds, '
+                                                               'and tested them for their '
+                                                               'potential ability to bind chymase '
+                                                               'enzyme using docking and a deep '
+                                                               'analysis of surface pocket '
+                                                               'features.',
+                                                   'Source': 'SuppKG',
+                                                   'Type': 'interacts_with'},
+                                    'type': 'DSI_Drug'},
+                                   {'citations': [{'type': 'PMID',
+                                                   'value': '28913553 | 24507159|31392409'}],
+                                    'evidence': ['Type: is_effective_for',
+                                                 'Confidence: 0.865986824 | '
+                                                 '0.8854908347|0.9129152298000001',
+                                                 'PubMed_ID: 28913553 | 24507159|31392409',
+                                                 'Sentence: Thus, dual targeting of neutrophil- '
+                                                 'and mast cell-derived proteases could be used as '
+                                                 'a novel therapeutic strategy to reduce post-IR '
+                                                 'inflammation and improve cardiac remodeling. | '
+                                                 'Development of mast cells and importance of '
+                                                 'their tryptase and chymase serine proteases in '
+                                                 'inflammation and wound healing.|Chymase is known '
+                                                 'to be closely involved in the mechanisms of '
+                                                 'inflammation and allergy, angiogenesis, and '
+                                                 'oncogenesis, remodeling of the extracellular '
+                                                 'matrix of the connective tissue and changes in '
+                                                 'organ histoarchitectonics.',
+                                                 'Source: SuppKG'],
+                                    'properties': {'Confidence': '0.865986824 | '
+                                                                 '0.8854908347|0.9129152298000001',
+                                                   'PubMed_ID': '28913553 | 24507159|31392409',
+                                                   'Sentence': 'Thus, dual targeting of '
+                                                               'neutrophil- and mast cell-derived '
+                                                               'proteases could be used as a novel '
+                                                               'therapeutic strategy to reduce '
+                                                               'post-IR inflammation and improve '
+                                                               'cardiac remodeling. | Development '
+                                                               'of mast cells and importance of '
+                                                               'their tryptase and chymase serine '
+                                                               'proteases in inflammation and '
+                                                               'wound healing.|Chymase is known to '
+                                                               'be closely involved in the '
+                                                               'mechanisms of inflammation and '
+                                                               'allergy, angiogenesis, and '
+                                                               'oncogenesis, remodeling of the '
+                                                               'extracellular matrix of the '
+                                                               'connective tissue and changes in '
+                                                               'organ histoarchitectonics.',
+                                                   'Source': 'SuppKG',
+                                                   'Type': 'is_effective_for'},
+                                    'type': 'Drug_Disease'}],
+                     'summary': '-DSI_Drug→ ginkgo -Drug_Disease→ Chymase'}]}]
+

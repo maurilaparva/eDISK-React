@@ -1,0 +1,38 @@
+# Python cache
+__pycache__/
+*.pyc
+
+#React build
+node_modules/
+node_modules
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+*.pem
+
+
+# Django
+*.sqlite3
+*.log
+/staticfiles/
+/media/
+/migrations/__pycache__/
+
+# Local data or embeddings
+data/
+*.db
+*.pkl
+*.bin
+*.faiss
+*.gz
+*.jsonl
+*.npy
+*.index
+
+# System / IDE
+.DS_Store
+.idea/
+.vscode/

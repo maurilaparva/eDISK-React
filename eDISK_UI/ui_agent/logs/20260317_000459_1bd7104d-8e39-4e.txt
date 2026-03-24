@@ -1,0 +1,113 @@
+Query Metadata
+--------------
+{'question': 'What does this supplement help with?',
+ 'relation': 'associated_with',
+ 'timestamp_utc': '20260317_000459'}
+
+Parsed Entities
+---------------
+[{'text': 'supplement', 'type': 'DSI'}]
+
+Entity Linking
+--------------
+{'candidates': [{'candidates': [{'id': 'DSP085121',
+                                 'name': 'Super Supplemental',
+                                 'score': 0.6533053517341614,
+                                 'type': 'DSP'},
+                                {'id': 'DSP085027',
+                                 'name': 'Super Supplemental',
+                                 'score': 0.6533053517341614,
+                                 'type': 'DSP'},
+                                {'id': 'D001764',
+                                 'name': 'oral supplement',
+                                 'score': 0.6436998248100281,
+                                 'type': 'Drug'},
+                                {'id': 'DSP144862',
+                                 'name': 'Fiber Supplement',
+                                 'score': 0.6223311424255371,
+                                 'type': 'DSP'},
+                                {'id': 'D005191',
+                                 'name': 'trace element supplement',
+                                 'score': 0.6146351099014282,
+                                 'type': 'Drug'},
+                                {'id': 'DSP092474',
+                                 'name': 'Essential Supplement',
+                                 'score': 0.611640214920044,
+                                 'type': 'DSP'},
+                                {'id': 'DSP028048',
+                                 'name': 'Supplement Yin',
+                                 'score': 0.5854629874229431,
+                                 'type': 'DSP'},
+                                {'id': 'DSI005576',
+                                 'name': 'Blend (Dietary substance used by man to supplement the '
+                                         'diet by increasing the total dietary intake)',
+                                 'score': 0.5830874443054199,
+                                 'type': 'DSI'},
+                                {'id': 'DSP086061',
+                                 'name': 'Surf Supplement',
+                                 'score': 0.5726432800292969,
+                                 'type': 'DSP'},
+                                {'id': 'DSP138908',
+                                 'name': 'Joint Support Supplement',
+                                 'score': 0.5705002546310425,
+                                 'type': 'DSP'}],
+                 'input': {'text': 'supplement', 'type': 'DSI'}}],
+ 'category': None,
+ 'mode': 'single',
+ 'selected': [{'input': {'text': 'supplement', 'type': 'DSI'},
+               'mapped': {'id': 'DSP085121',
+                          'name': 'Super Supplemental',
+                          'score': 0.6533053517341614,
+                          'type': 'DSP'}}]}
+
+Direct Relationship Query
+-------------------------
+{}
+
+Direct Relationship Result
+--------------------------
+[]
+
+Context Queries & Results
+-------------------------
+[{'entity': {'id': 'DSP085121',
+             'name': 'Super Supplemental',
+             'score': 0.6533053517341614,
+             'type': 'DSP'},
+  'neighbors': [],
+  'queries': {'one_hop': {'cypher': 'MATCH (e {eDISK_ID:$eid})-[r]-(n)\n'
+                                    '        WHERE ($types = [] OR ANY(lbl IN labels(n) WHERE lbl '
+                                    'IN $types))\n'
+                                    '          AND ($rels = [] OR type(r) IN $rels)\n'
+                                    '        RETURN {\n'
+                                    '            neighbor_id: coalesce(n.eDISK_ID, n.id, n.ID),\n'
+                                    '            neighbor_name: coalesce(n.Name, n.name, n.Symbol, '
+                                    'n.Label, n.eDISK_ID, n.id),\n'
+                                    '            neighbor_labels: labels(n),\n'
+                                    '            relation: type(r),\n'
+                                    '            direction: CASE WHEN startNode(r)=e THEN '
+                                    "'outbound' ELSE 'inbound' END,\n"
+                                    '            relation_props: properties(r)\n'
+                                    '        } AS hop\n'
+                                    '        LIMIT $limit',
+                          'params': {'eid': 'DSP085121',
+                                     'limit': 60,
+                                     'rels': [],
+                                     'types': ['DSI',
+                                               'DSP',
+                                               'Disease',
+                                               'Drug',
+                                               'Symptom',
+                                               'Gene']}}}}]
+
+Link Prediction
+---------------
+{'backend': {'details': '[Errno 2] No such file or directory: '
+                        "'/home/laparva/visual_intelligence_lab/eDISK-main/eDISK_UI/data/pykeen_transe/training_triples.tsv'",
+             'mode': 'fallback'},
+ 'per_entity': []}
+
+Verification
+------------
+[]
+

@@ -1,0 +1,105 @@
+Query Metadata
+--------------
+{'question': 'Is gingko related to memory loss?',
+ 'relation': 'associated_with',
+ 'timestamp_utc': '20260210_220525'}
+
+Parsed Entities
+---------------
+[{'text': 'gingko', 'type': 'DSI'}, {'text': 'memory loss', 'type': 'Symptom'}]
+
+Entity Linking
+--------------
+{'candidates': [{'candidates': [{'id': 'DSI000108',
+                                 'name': 'ginkgo',
+                                 'score': 0.8525615930557251,
+                                 'type': 'DSI'},
+                                {'id': 'DSI010229',
+                                 'name': 'ginkgo',
+                                 'score': 0.8525615930557251,
+                                 'type': 'DSI'},
+                                {'id': 'DSI000330',
+                                 'name': 'ginkgo biloba',
+                                 'score': 0.7557752728462219,
+                                 'type': 'DSI'},
+                                {'id': 'DSI004905',
+                                 'name': 'ginkgo biloba leaf',
+                                 'score': 0.719255805015564,
+                                 'type': 'DSI'},
+                                {'id': 'DSI008814',
+                                 'name': 'GINGKO BILOBA EXTRACT',
+                                 'score': 0.6659071445465088,
+                                 'type': 'DSI'},
+                                {'id': 'DSI006687',
+                                 'name': 'Ginkgoside',
+                                 'score': 0.6652555465698242,
+                                 'type': 'DSI'},
+                                {'id': 'DSI004232',
+                                 'name': 'Family Ginkgoaceae',
+                                 'score': 0.634583055973053,
+                                 'type': 'DSI'},
+                                {'id': 'DSI006663',
+                                 'name': 'ginkgolide',
+                                 'score': 0.6329172253608704,
+                                 'type': 'DSI'}],
+                 'input': {'text': 'gingko', 'type': 'DSI'}},
+                {'candidates': [{'id': 'DIS000134',
+                                 'name': 'memory loss',
+                                 'score': 0.9999995231628418,
+                                 'type': 'Dis'},
+                                {'id': 'DIS000156',
+                                 'name': 'Memory impairment',
+                                 'score': 0.7739057540893555,
+                                 'type': 'Dis'},
+                                {'id': 'DIS003353',
+                                 'name': 'Memory Disorders',
+                                 'score': 0.6342008709907532,
+                                 'type': 'Dis'}],
+                 'input': {'text': 'memory loss', 'type': 'Symptom'}}],
+ 'category': None,
+ 'mode': 'pair',
+ 'selected': [{'input': {'text': 'gingko', 'type': 'DSI'},
+               'mapped': {'id': 'DSI000108',
+                          'name': 'ginkgo',
+                          'score': 0.8525615930557251,
+                          'type': 'DSI'}},
+              {'input': {'text': 'memory loss', 'type': 'Symptom'},
+               'mapped': {'id': 'DIS000134',
+                          'name': 'memory loss',
+                          'score': 0.9999995231628418,
+                          'type': 'Dis'}}]}
+
+Direct Relationship Query
+-------------------------
+{'cypher': 'MATCH p = (a {eDISK_ID:$e1})-[*1..1]-(b {eDISK_ID:$e2})\n'
+           '    WITH relationships(p) AS rels, p\n'
+           '    RETURN\n'
+           '        p,\n'
+           '        [rel IN rels |\n'
+           '            {\n'
+           '                edge_type: type(rel),\n'
+           '                properties: properties(rel)\n'
+           '            }\n'
+           '        ] AS rel_info\n'
+           '    LIMIT 50',
+ 'params': {'e1': 'DSI000108', 'e2': 'DIS000134'}}
+
+Direct Relationship Result
+--------------------------
+[]
+
+Context Queries & Results
+-------------------------
+[]
+
+Link Prediction
+---------------
+{'backend': {'details': '[Errno 2] No such file or directory: '
+                        "'/home/laparva/visual_intelligence_lab/eDISK-main/eDISK_UI/data/pykeen_transe/training_triples.tsv'",
+             'mode': 'fallback'},
+ 'per_entity': []}
+
+Verification
+------------
+[]
+

@@ -1,0 +1,18 @@
+# Core web stack
+Django==4.2.5
+
+# LLM and embedding clients
+openai>=1.12.0
+
+# Graph database access
+neo4j>=5.18.0
+
+# Vector search and numerical computing
+faiss-cpu>=1.7.4
+numpy>=1.24.0
+
+# Link prediction (optional but enabled by default)
+pykeen>=1.10.1
+torch>=2.1.0
+
+tqdm>=4.66.0
