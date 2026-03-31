@@ -1,6 +1,7 @@
 # Core web stack
 Django==4.2.5
-
+python-dotenv>=1.0.0
+django-cors-headers>=4.3.0
 # LLM and embedding clients
 openai>=1.12.0
 
