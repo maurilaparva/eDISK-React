@@ -9,7 +9,7 @@
 // In dev, empty string means "same origin" (Vite proxy handles it).
 // In production (GitHub Pages), this points to your EC2 instance.
 const API_BASE = import.meta.env.PROD
-  ? 'http://3.209.182.77'   // ← Your EC2 public IP (or Elastic IP)
+  ? ''   // ← Your EC2 public IP (or Elastic IP)
   : '';
 // ─────────────────────────────────────────────────────────────
 
